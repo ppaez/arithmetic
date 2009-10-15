@@ -41,17 +41,6 @@ for linenumber, linea in enumerate( text.splitlines() ):
         if linea[ IgualActStart-1: IgualActStart ] != '=' and \
               linea[ IgualActEnd : IgualActEnd+1 ] != '=':
 
-            # the smaller of mIgualSig, mSeparDer, endofline
-            DerechaEnds = []
-            mIgualSig = reIgualSig.search( linea, IgualActEnd )
-            if mIgualSig:
-                DerechaEnds.append( mIgualSig.end() - 1 )
-            mSeparDer = reSeparSig.search( linea, IgualActEnd )
-            if mSeparDer:
-                DerechaEnds.append( mSeparDer.end() )
-            DerechaEnds.append( len( linea ) )
-            DerechaActEnd = min( DerechaEnds )
-
             # the larger of mIgualAnt, mSeparIzq, mDospuntosIzq, beginofline
             IzquierdaStarts = []
             mIgualAnt = reIgualAnt.search( linea, IgualAntStart, IgualActStart )
@@ -65,6 +54,17 @@ for linenumber, linea in enumerate( text.splitlines() ):
                 IzquierdaStarts.append( mDospuntosIzq.start() + 2 )
             IzquierdaStarts.append( 0 )
             izquierdaActStart = max( IzquierdaStarts )
+
+            # the smaller of mIgualSig, mSeparDer, endofline
+            DerechaEnds = []
+            mIgualSig = reIgualSig.search( linea, IgualActEnd )
+            if mIgualSig:
+                DerechaEnds.append( mIgualSig.end() - 1 )
+            mSeparDer = reSeparSig.search( linea, IgualActEnd )
+            if mSeparDer:
+                DerechaEnds.append( mSeparDer.end() )
+            DerechaEnds.append( len( linea ) )
+            DerechaActEnd = min( DerechaEnds )
 
             rangoizquierda = linea[ izquierdaActStart : IgualActStart ]
             rangocentro = linea[ IgualActStart : IgualActEnd ]
@@ -104,6 +104,7 @@ for linenumber, linea in enumerate( text.splitlines() ):
                 DerechaAntStart = IgualActEnd
                 DerechaAntEnd = DerechaActEnd
                 findelinea =  linea[ DerechaActEnd : ]
+
         IgualAntStart = IgualActStart
         IgualAntEnd = IgualActEnd
         mIgual = reIgual.search( linea, IgualAntEnd )
