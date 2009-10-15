@@ -18,65 +18,64 @@ cuantia basica = salario promedio x 0.13
 cuantia basica =    es el resultado final.
 '''
 
-igual = re.compile( '=' )
-sigigual  = re.compile( '[^=]*=' )
-sigsepar  = re.compile( '.*?  ' )
-antigual= re.compile( '=[^=]*' )
-antsepar = re.compile( '  .*' )
-antdospuntos = re.compile( ':[^:]*' )
+reIgual = re.compile( '=' )
+reIgualSig  = re.compile( '[^=]*=' )
+reSeparSig  = re.compile( '.*?  ' )
+reIgualAnt = re.compile( '=[^=]*' )
+reSeparIzq = re.compile( '  .*' )
+reDospuntosIzq = re.compile( ':[^:]*' )
 
 #print text
 for linenumber, linea in enumerate( text.splitlines() ):
     salida = ''
     findelinea = linea
     long = len( linea )
-    igualendant = 0
-    igualstartant = 0
-    derechastartanterior = 0
-    derechaendanterior = 0
-    m = igual.search( linea, igualendant )
-    while m and igualendant < long:
-        igualstart = m.start()
-        igualend = m.end()
-        if linea[ igualstart-1: igualstart ] != '=' and \
-              linea[ igualend : igualend+1 ] != '=':
-            # the smaller of msigigual, msigsepar, endofline
-            derechaends = []
-            msigigual = sigigual.search( linea, igualend )
-            if msigigual:
-                derechaends.append( msigigual.end() - 1 )
-            msigsepar = sigsepar.search( linea, igualend )
-            if msigsepar:
-                derechaends.append( msigsepar.end() )
-            derechaends.append( len( linea ) )
-            derechaend = min( derechaends )
-            #print derechaends
-            # the larger of mantigual, mantsepar, mantdospuntos, beginofline
-            izquierdastarts = []
-            mantigual = antigual.search( linea, igualstartant, igualstart )
-            if mantigual:
-                #print mantigual.group(), mantigual.start(), mantigual.end()
-                izquierdastarts.append( mantigual.start() + 1 )
-            mantsepar = antsepar.search( linea, igualendant, igualstart )
-            if mantsepar:
-                #print mantsepar.group(), mantsepar.start(), mantsepar.end()
-                izquierdastarts.append( mantsepar.start() + 2 )
-            mantdospuntos = antdospuntos.search( linea, igualendant, igualstart )
-            if mantdospuntos:
-                izquierdastarts.append( mantdospuntos.start() + 2 )
-            izquierdastarts.append( 0 )
-            izquierdastart = max( izquierdastarts )
-            #print izquierdastarts
-            #print izquierdastart, derechaend,
-            rangoizquierda = linea[ izquierdastart : igualstart ]
-            rangocentro = linea[ igualstart : igualend ]
-            rangoderecha = linea[ igualend : derechaend ] 
-            if rangoizquierda.strip(): # i hay algo en la izquierda
+    IgualAntEnd = 0
+    IgualAntStart = 0
+    DerechaAntStart = 0
+    DerechaAntEnd = 0
+    mIgual = reIgual.search( linea, IgualAntEnd )
+    while mIgual:
+        IgualActStart = mIgual.start()
+        IgualActEnd = mIgual.end()
+        if linea[ IgualActStart-1: IgualActStart ] != '=' and \
+              linea[ IgualActEnd : IgualActEnd+1 ] != '=':
+
+            # the smaller of mIgualSig, mSeparDer, endofline
+            DerechaEnds = []
+            mIgualSig = reIgualSig.search( linea, IgualActEnd )
+            if mIgualSig:
+                DerechaEnds.append( mIgualSig.end() - 1 )
+            mSeparDer = reSeparSig.search( linea, IgualActEnd )
+            if mSeparDer:
+                DerechaEnds.append( mSeparDer.end() )
+            DerechaEnds.append( len( linea ) )
+            DerechaActEnd = min( DerechaEnds )
+
+            # the larger of mIgualAnt, mSeparIzq, mDospuntosIzq, beginofline
+            IzquierdaStarts = []
+            mIgualAnt = reIgualAnt.search( linea, IgualAntStart, IgualActStart )
+            if mIgualAnt:
+                IzquierdaStarts.append( mIgualAnt.start() + 1 )
+            mSeparIzq = reSeparIzq.search( linea, IgualAntEnd, IgualActStart )
+            if mSeparIzq:
+                IzquierdaStarts.append( mSeparIzq.start() + 2 )
+            mDospuntosIzq = reDospuntosIzq.search( linea, IgualAntEnd, IgualActStart )
+            if mDospuntosIzq:
+                IzquierdaStarts.append( mDospuntosIzq.start() + 2 )
+            IzquierdaStarts.append( 0 )
+            izquierdaActStart = max( IzquierdaStarts )
+
+            rangoizquierda = linea[ izquierdaActStart : IgualActStart ]
+            rangocentro = linea[ IgualActStart : IgualActEnd ]
+            rangoderecha = linea[ IgualActEnd : DerechaActEnd ] 
+
+            if rangoizquierda.strip(): # si hay algo en la izquierda
                 # analiza( rangoizquierda, rangoderecha )
                 if not salida:
-                    salida = '%2s %s' % ( linenumber, linea[ : izquierdastart ] ) 
+                    salida = '%2s %s' % ( linenumber, linea[ : izquierdaActStart ] ) 
                 # no repetir lado izquierdo
-                if derechastartanterior != izquierdastart or derechaendanterior != igualstart:
+                if DerechaAntStart != izquierdaActStart or DerechaAntEnd != IgualActStart:
                     salida = salida + '<%s>' % ( rangoizquierda )
                 # = y el lado derecho
                 n = ''; expresion = ''
@@ -102,13 +101,13 @@ for linenumber, linea in enumerate( text.splitlines() ):
                 else:
                     salida = salida + '%s<%s>' % ( rangocentro, 
                                         rangoderecha )
-                derechastartanterior = igualend
-                derechaendanterior = derechaend
-                findelinea =  linea[ derechaend : ]
-        igualstartant = igualstart
-        igualendant = igualend
-        m = igual.search( linea, igualendant )
+                DerechaAntStart = IgualActEnd
+                DerechaAntEnd = DerechaActEnd
+                findelinea =  linea[ DerechaActEnd : ]
+        IgualAntStart = IgualActStart
+        IgualAntEnd = IgualActEnd
+        mIgual = reIgual.search( linea, IgualAntEnd )
     if salida:
         print salida + findelinea
-    elif findelinea or igualendant == 0: 
+    elif findelinea or IgualAntEnd == 0: 
         print '%2s %s' % ( linenumber, findelinea )
