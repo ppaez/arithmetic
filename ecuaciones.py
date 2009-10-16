@@ -16,13 +16,14 @@ semanas cotizadas = 1,350
 salario promedio = 1,200
 cuantia basica = salario promedio x 0.13
 cuantia basica =    es el resultado final.
+             a = 3                       
 '''
 
 reIgual = re.compile( ' ?= ?' )
 
-reSeparSig  = re.compile( '  ' )
+reSeparSig  = re.compile( '  +' )
 reIgualAnt = re.compile( ' ?= ?' )
-reSeparIzq = re.compile( '  ' )
+reSeparIzq = re.compile( '  +' )
 reDospuntosIzq = re.compile( ': ' )
 
 #print text
@@ -56,7 +57,8 @@ for linenumber, linea in enumerate( text.splitlines() ):
             mDospuntosIzq = reDospuntosIzq.search( linea, IgualAntEnd, IgualActStart )
             if mDospuntosIzq:
                 IzquierdaStarts.append( mDospuntosIzq.end() )
-            IzquierdaStarts.append( 0 )
+            mBeginOfLine = re.search( '^ *', linea )
+            IzquierdaStarts.append( mBeginOfLine.end() )
             izquierdaActStart = max( IzquierdaStarts )
 
             # the smaller of mIgualSig, mSeparDer, endofline
@@ -72,7 +74,8 @@ for linenumber, linea in enumerate( text.splitlines() ):
             mSeparDer = reSeparSig.search( linea, IgualActEnd )
             if mSeparDer:
                 DerechaEnds.append( mSeparDer.start() )
-            DerechaEnds.append( len( linea ) )
+            mEndOfLine = re.search( ' *$', linea )
+            DerechaEnds.append( mEndOfLine.start() )
             DerechaActEnd = min( DerechaEnds )
 
             rangoizquierda = linea[ izquierdaActStart : IgualActStart ]
@@ -82,7 +85,8 @@ for linenumber, linea in enumerate( text.splitlines() ):
             if rangoizquierda.strip(): # si hay algo en la izquierda
                 # analiza( rangoizquierda, rangoderecha )
                 if not salida:
-                    salida = '%2s %s' % ( linenumber, linea[ : izquierdaActStart ] ) 
+                    salida = '%2s ' % ( linenumber )
+                salida = salida + '%s' % ( linea[ DerechaAntEnd : izquierdaActStart ] )
                 # no repetir lado izquierdo
                 if DerechaAntStart != izquierdaActStart or DerechaAntEnd != IgualActStart:
                     salida = salida + '<%s>' % ( rangoizquierda )
