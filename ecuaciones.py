@@ -12,11 +12,12 @@ perimetro = (base + altura) x 2 =
 
    Calculo de pension de cesantia:
 
-semanas cotizadas = 1,350
+semanas cotizadas = sc = 1,350
 salario promedio = 1,200
 cuantia basica = salario promedio x 0.13
 cuantia basica =    es el resultado final.
              a = 3                       
+             3 =
 '''
 
 reIgual = re.compile( ' ?= ?' )
@@ -26,7 +27,27 @@ reIgualAnt = re.compile( ' ?= ?' )
 reSeparIzq = re.compile( '  +' )
 reDospuntosIzq = re.compile( ': ' )
 
-#print text
+def TipoValorDe( unaexpresion ):
+    "Regresa tipo 'i', 'f', 'e', 'o' y valor."
+
+    if not unaexpresion.strip():  # vacio
+        return 'v', '0'
+    try:
+        n = int( unaexpresion.replace( ',', '' ) )
+        return 'i', n
+    except:
+        try:
+            n = float( unaexpresion.replace( ',', '' ) )
+            return 'f', n
+        except:
+            expresion_asterisco = re.sub( r'\bx\b', '*', unaexpresion )
+            for op in '+-*/':
+                if op in expresion_asterisco:
+                    expresion = op
+                    return 'e', expresion_asterisco
+            return 'n', unaexpresion.replace( ' ', '' )
+
+
 for linenumber, linea in enumerate( text.splitlines() ):
     salida = ''
     findelinea = linea
@@ -89,26 +110,19 @@ for linenumber, linea in enumerate( text.splitlines() ):
                 salida = salida + '%s' % ( linea[ DerechaAntEnd : izquierdaActStart ] )
                 # no repetir lado izquierdo
                 if DerechaAntStart != izquierdaActStart or DerechaAntEnd != IgualActStart:
-                    salida = salida + '<%s>' % ( rangoizquierda )
+                    tipo, valor = TipoValorDe( rangoizquierda )
+                    if tipo in 'ifv':
+                        salida = salida + '[%s]' % ( rangoizquierda ) 
+                    elif tipo == 'e':
+                        salida = salida + '{%s}' % ( rangoizquierda )
+                    else:
+                        salida = salida + '<%s>' % ( rangoizquierda )
                 # = y el lado derecho
-                n = ''; expresion = ''
-                try:
-                    n = int( rangoderecha.replace( ',', '' ) )
-                except:
-                    try:
-                        n = float( rangoderecha.replace( ',', '' ) )
-                    except:
-                        expresion_asterisco = re.sub( r'\bx\b', '*', rangoderecha )
-                        for op in '+-*/':
-                            if op in expresion_asterisco:
-                                expresion = op
-                                break
-                if not rangoderecha.strip():  # vacio
-                    n = '0'
-                if n:
+                tipo, valor = TipoValorDe( rangoderecha )
+                if tipo in 'ifv':
                     salida = salida + '%s[%s]' % ( rangocentro, 
                                         rangoderecha )
-                elif expresion:
+                elif tipo == 'e':
                     salida = salida + '%s{%s}' % ( rangocentro, 
                                         rangoderecha )
                 else:
