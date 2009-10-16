@@ -18,12 +18,12 @@ cuantia basica = salario promedio x 0.13
 cuantia basica =    es el resultado final.
 '''
 
-reIgual = re.compile( '=' )
-reIgualSig  = re.compile( '[^=]*=' )
-reSeparSig  = re.compile( '.*?  ' )
-reIgualAnt = re.compile( '=[^=]*' )
-reSeparIzq = re.compile( '  .*' )
-reDospuntosIzq = re.compile( ':[^:]*' )
+reIgual = re.compile( ' ?= ?' )
+
+reSeparSig  = re.compile( '  ' )
+reIgualAnt = re.compile( ' ?= ?' )
+reSeparIzq = re.compile( '  ' )
+reDospuntosIzq = re.compile( ': ' )
 
 #print text
 for linenumber, linea in enumerate( text.splitlines() ):
@@ -32,37 +32,46 @@ for linenumber, linea in enumerate( text.splitlines() ):
     long = len( linea )
     IgualAntEnd = 0
     IgualAntStart = 0
+    IgualSigStart = 0
+    IgualSigEnd = 0
     DerechaAntStart = 0
     DerechaAntEnd = 0
     mIgual = reIgual.search( linea, IgualAntEnd )
-    while mIgual:
+    if mIgual:
         IgualActStart = mIgual.start()
         IgualActEnd = mIgual.end()
-        if linea[ IgualActStart-1: IgualActStart ] != '=' and \
-              linea[ IgualActEnd : IgualActEnd+1 ] != '=':
+    while mIgual:
+        if True:
+        #if linea[ IgualActStart-1: IgualActStart ] != '=' and \
+        #      linea[ IgualActEnd : IgualActEnd+1 ] != '=':
 
             # the larger of mIgualAnt, mSeparIzq, mDospuntosIzq, beginofline
             IzquierdaStarts = []
             mIgualAnt = reIgualAnt.search( linea, IgualAntStart, IgualActStart )
             if mIgualAnt:
-                IzquierdaStarts.append( mIgualAnt.start() + 1 )
+                IzquierdaStarts.append( mIgualAnt.end() )
             mSeparIzq = reSeparIzq.search( linea, IgualAntEnd, IgualActStart )
             if mSeparIzq:
-                IzquierdaStarts.append( mSeparIzq.start() + 2 )
+                IzquierdaStarts.append( mSeparIzq.end() )
             mDospuntosIzq = reDospuntosIzq.search( linea, IgualAntEnd, IgualActStart )
             if mDospuntosIzq:
-                IzquierdaStarts.append( mDospuntosIzq.start() + 2 )
+                IzquierdaStarts.append( mDospuntosIzq.end() )
             IzquierdaStarts.append( 0 )
             izquierdaActStart = max( IzquierdaStarts )
 
             # the smaller of mIgualSig, mSeparDer, endofline
             DerechaEnds = []
-            mIgualSig = reIgualSig.search( linea, IgualActEnd )
+            mIgualSig = reIgual.search( linea, IgualActEnd )
             if mIgualSig:
-                DerechaEnds.append( mIgualSig.end() - 1 )
+                IgualSigStart = mIgualSig.start()
+                IgualSigEnd = mIgualSig.end()
+                DerechaEnds.append( mIgualSig.start() )
+            else:
+                IgualSigStart = 0
+                IgualSigEnd = 0
             mSeparDer = reSeparSig.search( linea, IgualActEnd )
             if mSeparDer:
-                DerechaEnds.append( mSeparDer.end() )
+                DerechaEnds.append( mSeparDer.start() )
             DerechaEnds.append( len( linea ) )
             DerechaActEnd = min( DerechaEnds )
 
@@ -107,7 +116,9 @@ for linenumber, linea in enumerate( text.splitlines() ):
 
         IgualAntStart = IgualActStart
         IgualAntEnd = IgualActEnd
-        mIgual = reIgual.search( linea, IgualAntEnd )
+        IgualActStart = IgualSigStart
+        IgualActEnd = IgualSigEnd
+        mIgual = mIgualSig
     if salida:
         print salida + findelinea
     elif findelinea or IgualAntEnd == 0: 
