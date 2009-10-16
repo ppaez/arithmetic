@@ -108,21 +108,28 @@ for linenumber, linea in enumerate( text.splitlines() ):
                 if not salida:
                     salida = '%2s ' % ( linenumber )
                 salida = salida + '%s' % ( linea[ DerechaAntEnd : izquierdaActStart ] )
+
+                tipoIzq, valorIzq = TipoValorDe( rangoizquierda )
+                tipoDer, valorDer = TipoValorDe( rangoderecha )
+                if tipoIzq == 'e' and tipoDer == 'v':
+                    try:
+                        rangoderecha = eval( valorIzq )
+                    except:
+                        pass
+
                 # no repetir lado izquierdo
                 if DerechaAntStart != izquierdaActStart or DerechaAntEnd != IgualActStart:
-                    tipo, valor = TipoValorDe( rangoizquierda )
-                    if tipo in 'ifv':
+                    if tipoIzq in 'ifv':
                         salida = salida + '[%s]' % ( rangoizquierda ) 
-                    elif tipo == 'e':
+                    elif tipoIzq == 'e':
                         salida = salida + '{%s}' % ( rangoizquierda )
                     else:
                         salida = salida + '<%s>' % ( rangoizquierda )
                 # = y el lado derecho
-                tipo, valor = TipoValorDe( rangoderecha )
-                if tipo in 'ifv':
+                if tipoDer in 'ifv':
                     salida = salida + '%s[%s]' % ( rangocentro, 
                                         rangoderecha )
-                elif tipo == 'e':
+                elif tipoDer == 'e':
                     salida = salida + '%s{%s}' % ( rangocentro, 
                                         rangoderecha )
                 else:
