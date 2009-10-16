@@ -21,10 +21,7 @@ cuantia basica =    es el resultado final.
 '''
 
 reIgual = re.compile( ' ?= ?' )
-
-reSeparSig  = re.compile( '  +' )
-reIgualAnt = re.compile( ' ?= ?' )
-reSeparIzq = re.compile( '  +' )
+reSepar = re.compile( '  +' )
 reDospuntosIzq = re.compile( ': ' )
 
 def TipoValorDe( unaexpresion ):
@@ -51,31 +48,20 @@ def TipoValorDe( unaexpresion ):
 for linenumber, linea in enumerate( text.splitlines() ):
     salida = ''
     findelinea = linea
-    long = len( linea )
-    IgualAntEnd = 0
-    IgualAntStart = 0
-    IgualSigStart = 0
-    IgualSigEnd = 0
     DerechaAntStart = 0
     DerechaAntEnd = 0
-    mIgual = reIgual.search( linea, IgualAntEnd )
-    if mIgual:
-        IgualActStart = mIgual.start()
-        IgualActEnd = mIgual.end()
-    while mIgual:
+    mIgualAnt = re.search( '^', linea )
+    mIgualAct = reIgual.search( linea, mIgualAnt.end() )
+    while mIgualAct:
         if True:
-        #if linea[ IgualActStart-1: IgualActStart ] != '=' and \
-        #      linea[ IgualActEnd : IgualActEnd+1 ] != '=':
 
             # the larger of mIgualAnt, mSeparIzq, mDospuntosIzq, beginofline
             IzquierdaStarts = []
-            mIgualAnt = reIgualAnt.search( linea, IgualAntStart, IgualActStart )
-            if mIgualAnt:
-                IzquierdaStarts.append( mIgualAnt.end() )
-            mSeparIzq = reSeparIzq.search( linea, IgualAntEnd, IgualActStart )
+            IzquierdaStarts.append( mIgualAnt.end() )
+            mSeparIzq = reSepar.search( linea, mIgualAnt.end(), mIgualAct.start() )
             if mSeparIzq:
                 IzquierdaStarts.append( mSeparIzq.end() )
-            mDospuntosIzq = reDospuntosIzq.search( linea, IgualAntEnd, IgualActStart )
+            mDospuntosIzq = reDospuntosIzq.search( linea, mIgualAnt.end(), mIgualAct.start() )
             if mDospuntosIzq:
                 IzquierdaStarts.append( mDospuntosIzq.end() )
             mBeginOfLine = re.search( '^ *', linea )
@@ -84,24 +70,19 @@ for linenumber, linea in enumerate( text.splitlines() ):
 
             # the smaller of mIgualSig, mSeparDer, endofline
             DerechaEnds = []
-            mIgualSig = reIgual.search( linea, IgualActEnd )
+            mIgualSig = reIgual.search( linea, mIgualAct.end() )
             if mIgualSig:
-                IgualSigStart = mIgualSig.start()
-                IgualSigEnd = mIgualSig.end()
                 DerechaEnds.append( mIgualSig.start() )
-            else:
-                IgualSigStart = 0
-                IgualSigEnd = 0
-            mSeparDer = reSeparSig.search( linea, IgualActEnd )
+            mSeparDer = reSepar.search( linea, mIgualAct.end() )
             if mSeparDer:
                 DerechaEnds.append( mSeparDer.start() )
             mEndOfLine = re.search( ' *$', linea )
             DerechaEnds.append( mEndOfLine.start() )
             DerechaActEnd = min( DerechaEnds )
 
-            rangoizquierda = linea[ izquierdaActStart : IgualActStart ]
-            rangocentro = linea[ IgualActStart : IgualActEnd ]
-            rangoderecha = linea[ IgualActEnd : DerechaActEnd ] 
+            rangoizquierda = linea[ izquierdaActStart : mIgualAct.start() ]
+            rangocentro = linea[ mIgualAct.start() : mIgualAct.end() ]
+            rangoderecha = linea[ mIgualAct.end() : DerechaActEnd ] 
 
             if rangoizquierda.strip(): # si hay algo en la izquierda
                 # analiza( rangoizquierda, rangoderecha )
@@ -118,7 +99,7 @@ for linenumber, linea in enumerate( text.splitlines() ):
                         pass
 
                 # no repetir lado izquierdo
-                if DerechaAntStart != izquierdaActStart or DerechaAntEnd != IgualActStart:
+                if DerechaAntStart != izquierdaActStart or DerechaAntEnd != mIgualAct.start():
                     if tipoIzq in 'ifv':
                         salida = salida + '[%s]' % ( rangoizquierda ) 
                     elif tipoIzq == 'e':
@@ -135,16 +116,13 @@ for linenumber, linea in enumerate( text.splitlines() ):
                 else:
                     salida = salida + '%s<%s>' % ( rangocentro, 
                                         rangoderecha )
-                DerechaAntStart = IgualActEnd
+                DerechaAntStart = mIgualAct.end()
                 DerechaAntEnd = DerechaActEnd
                 findelinea =  linea[ DerechaActEnd : ]
 
-        IgualAntStart = IgualActStart
-        IgualAntEnd = IgualActEnd
-        IgualActStart = IgualSigStart
-        IgualActEnd = IgualSigEnd
-        mIgual = mIgualSig
+        mIgualAnt = mIgualAct
+        mIgualAct = mIgualSig
     if salida:
         print salida + findelinea
-    elif findelinea or IgualAntEnd == 0: 
+    elif findelinea or mIgualAnt.end() == 0: 
         print '%2s %s' % ( linenumber, findelinea )
