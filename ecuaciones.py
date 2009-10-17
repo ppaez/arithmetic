@@ -14,7 +14,7 @@ perimetro = (base + altura) x 2 =
 
 semanas cotizadas = sc = 1,350
 salario promedio = 1,200
-cuantia basica = salario promedio x 0.13
+cuantia basica = salario promedio x 13%
 cuantia basica =    es el resultado final.
              a = 3                       
              3 =
@@ -28,7 +28,7 @@ def TipoValorDe( unaexpresion ):
     "Regresa tipo 'i', 'f', 'e', 'o' y valor."
 
     if not unaexpresion.strip():  # vacio
-        return 'v', '0'
+        return 'v', ''
     try:
         n = int( unaexpresion.replace( ',', '' ) )
         return 'i', n
@@ -37,13 +37,16 @@ def TipoValorDe( unaexpresion ):
             n = float( unaexpresion.replace( ',', '' ) )
             return 'f', n
         except:
-            expresion_asterisco = re.sub( r'\bx\b', '*', unaexpresion )
+            expresion_python = re.sub( r'\bx\b', '*', unaexpresion )
+            expresion_python = re.sub( r'%', '/100.', expresion_python )
             for op in '+-*/':
-                if op in expresion_asterisco:
-                    expresion = op
-                    return 'e', expresion_asterisco
+                if op in expresion_python:
+                    for varname in globales.keys():
+                        expresion_python = expresion_python.replace( varname, varname+'()' )
+                    return 'e', expresion_python.replace( ' ', '' )
             return 'n', unaexpresion.replace( ' ', '' )
 
+globales = { '__builtins__' : '' }
 
 for linenumber, linea in enumerate( text.splitlines() ):
     salida = ''
@@ -89,11 +92,23 @@ for linenumber, linea in enumerate( text.splitlines() ):
 
         if tipoIzq != 'v': # si hay algo en la izquierda
 
+            # operaciones
             if tipoIzq == 'e' and tipoDer == 'v':
                 try:
-                    rangoderecha = eval( valorIzq )
+                    rangoderecha = eval( valorIzq, globales )
                 except:
-                    pass
+                    print 'eval error:', tipoIzq, valorIzq, tipoDer, valorDer
+            elif tipoIzq == 'n' and tipoDer in 'ife':
+                try:
+                    exec valorIzq + ' = lambda : ' + str(valorDer) in globales
+                except:
+                    print 'exec error:', tipoIzq, valorIzq, tipoDer, valorDer
+                    raise
+            elif tipoIzq == 'n' and tipoDer == 'v' and valorIzq in globales.keys():
+                try:
+                    rangoderecha = eval( valorIzq + '()', globales )
+                except:
+                    print 'eval error:', tipoIzq, valorIzq, tipoDer, valorDer
 
             # genera salida
             salida = salida + '%s' % ( rangolibre )
