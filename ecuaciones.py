@@ -79,24 +79,24 @@ for linenumber, linea in enumerate( text.splitlines() ):
         DerechaEnds.append( mEndOfLine.start() )
         DerechaActEnd = min( DerechaEnds )
 
+        rangolibre     = linea[ DerechaAntEnd     : izquierdaActStart ]
         rangoizquierda = linea[ izquierdaActStart : mIgualAct.start() ]
-        rangocentro = linea[ mIgualAct.start() : mIgualAct.end() ]
-        rangoderecha = linea[ mIgualAct.end() : DerechaActEnd ] 
+        rangocentro    = linea[ mIgualAct.start() : mIgualAct.end() ]
+        rangoderecha   = linea[ mIgualAct.end()   : DerechaActEnd ] 
 
-        if rangoizquierda.strip(): # si hay algo en la izquierda
-            # analiza( rangoizquierda, rangoderecha )
-            if not salida:
-                salida = '%2s ' % ( linenumber )
-            salida = salida + '%s' % ( linea[ DerechaAntEnd : izquierdaActStart ] )
+        tipoIzq, valorIzq = TipoValorDe( rangoizquierda )
+        tipoDer, valorDer = TipoValorDe( rangoderecha )
 
-            tipoIzq, valorIzq = TipoValorDe( rangoizquierda )
-            tipoDer, valorDer = TipoValorDe( rangoderecha )
+        if tipoIzq != 'v': # si hay algo en la izquierda
+
             if tipoIzq == 'e' and tipoDer == 'v':
                 try:
                     rangoderecha = eval( valorIzq )
                 except:
                     pass
 
+            # genera salida
+            salida = salida + '%s' % ( rangolibre )
             # no repetir lado izquierdo
             if DerechaAntStart != izquierdaActStart or DerechaAntEnd != mIgualAct.start():
                 if tipoIzq in 'ifv':
@@ -121,7 +121,5 @@ for linenumber, linea in enumerate( text.splitlines() ):
 
         mIgualAnt = mIgualAct
         mIgualAct = mIgualSig
-    if salida:
-        print salida + findelinea
-    elif findelinea or mIgualAnt.end() == 0: 
-        print '%2s %s' % ( linenumber, findelinea )
+
+    print '%2s %s' % ( linenumber, salida + findelinea )
