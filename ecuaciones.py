@@ -1,24 +1,6 @@
-import re
+import re, sys
 
-text = '''
-=====
-= = = = =
-Supongamos: base = 5 x 3 =   para empezar.
-  altura= 2   radio=   lado = 5
-base x altura =
-
-perimetro = (base + altura) x 2 =
- perimetro =
-
-   Calculo de pension de cesantia:
-
-semanas cotizadas = sc = 1,350
-salario promedio = 1,200
-cuantia basica = salario promedio x 13%
-cuantia basica =    es el resultado final.
-             a = 3                       
-             3 =
-'''
+text = open( sys.argv[1] ).read()
 
 reIgual = re.compile( ' ?= ?' )
 reSepar = re.compile( '  +' )
