@@ -24,8 +24,7 @@ def TipoValorDe( unaexpresion ):
             for op in '+-*/':
                 if op in expresion_python:
                     expresion_python = expresion_python.replace( ' ', '' )
-                    for varname in globales.keys():
-                        expresion_python = expresion_python.replace( varname, varname+'()' )
+                    expresion_python = re.sub( '([a-zA-Z][a-zA-Z0-9]*)', r'\1()', expresion_python )
                     return 'e', expresion_python
             return 'n', unaexpresion.replace( ' ', '' )
 
