@@ -11,7 +11,7 @@ altura = 3    perimetro =
 altura = 4    perimetro =
 
 c = (f - 32) x 5 / 9
-f = 212     c =
+f = 212     c =567
 f = 100     c =
 f = 75      c =
 f = 32      c =
@@ -22,7 +22,7 @@ dato = 2    cuadrado =
 dato = 3    cuadrado =
 dato = 9    cuadrado =
 dato = 81   cuadrado =
-dato = 729  cuadrado =
+dato = 729  cuadrado =400
 
    Calculo de pension de cesantia:
 

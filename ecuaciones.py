@@ -29,6 +29,7 @@ def TipoValorDe( unaexpresion ):
             return 'n', unaexpresion.replace( ' ', '' )
 
 globales = { '__builtins__' : '' }
+funciones = []
 
 for linenumber, linea in enumerate( text.splitlines() ):
     salida = ''
@@ -80,12 +81,26 @@ for linenumber, linea in enumerate( text.splitlines() ):
                     rangoderecha = eval( valorIzq, globales )
                 except:
                     print 'eval error:', tipoIzq, valorIzq, tipoDer, valorDer
-            elif tipoIzq == 'n' and tipoDer in 'ife':
+            elif tipoIzq == 'n' and tipoDer in 'e':
+                try:
+                    exec valorIzq + ' = lambda : ' + str(valorDer) in globales
+                    if '()' in valorDer and valorIzq not in funciones:
+                        funciones.append( valorIzq )
+                except:
+                    print 'exec error:', tipoIzq, valorIzq, tipoDer, valorDer
+                    raise
+            elif tipoIzq == 'n' and tipoDer in 'if':
+              if valorIzq not in funciones:
                 try:
                     exec valorIzq + ' = lambda : ' + str(valorDer) in globales
                 except:
                     print 'exec error:', tipoIzq, valorIzq, tipoDer, valorDer
                     raise
+              else:
+                try:
+                    rangoderecha = eval( valorIzq + '()', globales )
+                except:
+                    print 'eval error:', tipoIzq, valorIzq, tipoDer, valorDer
             elif tipoIzq == 'n' and tipoDer == 'v' and valorIzq in globales.keys():
                 try:
                     rangoderecha = eval( valorIzq + '()', globales )
@@ -104,7 +119,11 @@ for linenumber, linea in enumerate( text.splitlines() ):
                     salida = salida + '<%s>' % ( rangoizquierda )
             # = y el lado derecho
             if tipoDer in 'ifv':
-                salida = salida + '%s[%s]' % ( rangocentro, 
+                if valorIzq not in funciones:
+                    salida = salida + '%s[%s]' % ( rangocentro, 
+                                    rangoderecha )
+                else:
+                    salida = salida + '%s%s' % ( rangocentro, 
                                     rangoderecha )
             elif tipoDer == 'e':
                 salida = salida + '%s{%s}' % ( rangocentro, 
