@@ -40,6 +40,7 @@ for linenumber, linea in enumerate( text.splitlines() ):
     mIgualAct = reIgual.search( linea, mIgualAnt.end() )
     while mIgualAct:
 
+        # Determina izquierdaActStart
         # the larger of mIgualAnt, mSeparIzq, mDospuntosIzq, beginofline
         IzquierdaStarts = []
         IzquierdaStarts.append( mIgualAnt.end() )
@@ -53,6 +54,7 @@ for linenumber, linea in enumerate( text.splitlines() ):
         IzquierdaStarts.append( mBeginOfLine.end() )
         izquierdaActStart = max( IzquierdaStarts )
 
+        # Determina DerechaActEnd
         # the smaller of mIgualSig, mSeparDer, endofline
         DerechaEnds = []
         mIgualSig = reIgual.search( linea, mIgualAct.end() )
@@ -74,14 +76,14 @@ for linenumber, linea in enumerate( text.splitlines() ):
         tipoDer, valorDer = TipoValorDe( rangoderecha )
 
         if tipoIzq != 'v': # si hay algo en la izquierda
+            # hacer operaciones
 
-            # operaciones
-            if tipoIzq == 'e' and tipoDer == 'v':
+            if tipoIzq == 'e' and tipoDer == 'v':    # evalua expresion
                 try:
                     rangoderecha = eval( valorIzq, globales )
                 except:
                     print 'eval error:', tipoIzq, valorIzq, tipoDer, valorDer
-            elif tipoIzq == 'n' and tipoDer in 'e':
+            elif tipoIzq == 'n' and tipoDer in 'e':  # define variable o funcion
                 try:
                     exec valorIzq + ' = lambda : ' + str(valorDer) in globales
                     if '()' in valorDer and valorIzq not in funciones:
@@ -90,19 +92,20 @@ for linenumber, linea in enumerate( text.splitlines() ):
                     print 'exec error:', tipoIzq, valorIzq, tipoDer, valorDer
                     raise
             elif tipoIzq == 'n' and tipoDer in 'if':
-              if valorIzq not in funciones:
+              if valorIzq not in funciones:          # asigna a variable
                 try:
                     exec valorIzq + ' = lambda : ' + str(valorDer) in globales
                 except:
                     print 'exec error:', tipoIzq, valorIzq, tipoDer, valorDer
                     raise
-              else:
+              else:                                  # evalua funcion
                 try:
                     rangoderecha = eval( valorIzq + '()', globales )
                 except:
                     print 'eval error:', tipoIzq, valorIzq, tipoDer, valorDer
-            elif tipoIzq == 'n' and tipoDer == 'v' and valorIzq in globales.keys():
-                try:
+            elif tipoIzq == 'n' and tipoDer == 'v' \
+                    and valorIzq in globales.keys(): # evalua variable o funcion
+                try: 
                     rangoderecha = eval( valorIzq + '()', globales )
                 except:
                     print 'eval error:', tipoIzq, valorIzq, tipoDer, valorDer
