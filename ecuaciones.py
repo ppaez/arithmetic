@@ -84,14 +84,12 @@ for linenumber, linea in enumerate( text.splitlines() ):
                     rangoderecha = str( eval( valorIzq, globales ) )
                 except:
                     print 'eval error:', tipoIzq, valorIzq, tipoDer, valorDer
-            elif tipoIzq == 'n' and tipoDer in 'e':  # define variable o funcion
-                try:
-                    exec valorIzq + ' = lambda : ' + str(valorDer) in globales
-                    if '()' in valorDer and valorIzq not in funciones:
-                        funciones.append( valorIzq )
+            elif tipoIzq == 'n' and tipoDer == 'v' \
+                    and valorIzq in globales.keys(): # evalua variable o funcion
+                try: 
+                    rangoderecha = str( eval( valorIzq + '()', globales ) )
                 except:
-                    print 'exec error:', tipoIzq, valorIzq, tipoDer, valorDer
-                    raise
+                    print 'eval error:', tipoIzq, valorIzq, tipoDer, valorDer
             elif tipoIzq == 'n' and tipoDer in 'if':
               if valorIzq not in funciones:          # asigna a variable
                 try:
@@ -104,12 +102,14 @@ for linenumber, linea in enumerate( text.splitlines() ):
                     rangoderecha = str( eval( valorIzq + '()', globales ) )
                 except:
                     print 'eval error:', tipoIzq, valorIzq, tipoDer, valorDer
-            elif tipoIzq == 'n' and tipoDer == 'v' \
-                    and valorIzq in globales.keys(): # evalua variable o funcion
-                try: 
-                    rangoderecha = str( eval( valorIzq + '()', globales ) )
+            elif tipoIzq == 'n' and tipoDer in 'e':  # define variable o funcion
+                try:
+                    exec valorIzq + ' = lambda : ' + str(valorDer) in globales
+                    if '()' in valorDer and valorIzq not in funciones:
+                        funciones.append( valorIzq )
                 except:
-                    print 'eval error:', tipoIzq, valorIzq, tipoDer, valorDer
+                    print 'exec error:', tipoIzq, valorIzq, tipoDer, valorDer
+                    raise
 
             # genera salida
             salida = salida + '%s' % ( rangolibre )
@@ -121,24 +121,22 @@ for linenumber, linea in enumerate( text.splitlines() ):
                     salida = salida + '{%s}' % ( rangoizquierda )
                 else:
                     salida = salida + '<%s>' % ( rangoizquierda )
-            # = y el lado derecho
+
+            salida = salida + rangocentro
+
+            # el lado derecho
             if tipoDer in 'ifv':
                 if valorIzq not in funciones:
-                    salida = salida + '%s[%s]' % ( rangocentro, 
-                                    rangoderecha )
+                    salida = salida + '[%s]' % ( rangoderecha )
                 else:
                     if rangoderecha == rangoderechaOri:
-                        salida = salida + '%s%s' % ( rangocentro, 
-                                        rangoderecha )
+                        salida = salida + '%s' % ( rangoderecha )
                     else:
-                        salida = salida + '%s%s<-' % ( rangocentro, 
-                                        rangoderecha )
+                        salida = salida + '%s<-' % ( rangoderecha )
             elif tipoDer == 'e':
-                salida = salida + '%s{%s}' % ( rangocentro, 
-                                    rangoderecha )
+                salida = salida + '{%s}' % ( rangoderecha )
             else:
-                salida = salida + '%s<%s>' % ( rangocentro, 
-                                    rangoderecha )
+                salida = salida + '<%s>' % ( rangoderecha )
             DerechaAntStart = mIgualAct.end()
             DerechaAntEnd = DerechaActEnd
             findelinea =  linea[ DerechaActEnd : ]
