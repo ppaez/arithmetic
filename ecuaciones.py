@@ -77,10 +77,11 @@ for linenumber, linea in enumerate( text.splitlines() ):
 
         if tipoIzq != 'v': # si hay algo en la izquierda
             # hacer operaciones
+            rangoderechaOri = rangoderecha
 
             if tipoIzq == 'e' and tipoDer == 'v':    # evalua expresion
                 try:
-                    rangoderecha = eval( valorIzq, globales )
+                    rangoderecha = str( eval( valorIzq, globales ) )
                 except:
                     print 'eval error:', tipoIzq, valorIzq, tipoDer, valorDer
             elif tipoIzq == 'n' and tipoDer in 'e':  # define variable o funcion
@@ -100,13 +101,13 @@ for linenumber, linea in enumerate( text.splitlines() ):
                     raise
               else:                                  # evalua funcion
                 try:
-                    rangoderecha = eval( valorIzq + '()', globales )
+                    rangoderecha = str( eval( valorIzq + '()', globales ) )
                 except:
                     print 'eval error:', tipoIzq, valorIzq, tipoDer, valorDer
             elif tipoIzq == 'n' and tipoDer == 'v' \
                     and valorIzq in globales.keys(): # evalua variable o funcion
                 try: 
-                    rangoderecha = eval( valorIzq + '()', globales )
+                    rangoderecha = str( eval( valorIzq + '()', globales ) )
                 except:
                     print 'eval error:', tipoIzq, valorIzq, tipoDer, valorDer
 
@@ -126,8 +127,12 @@ for linenumber, linea in enumerate( text.splitlines() ):
                     salida = salida + '%s[%s]' % ( rangocentro, 
                                     rangoderecha )
                 else:
-                    salida = salida + '%s%s' % ( rangocentro, 
-                                    rangoderecha )
+                    if rangoderecha == rangoderechaOri:
+                        salida = salida + '%s%s' % ( rangocentro, 
+                                        rangoderecha )
+                    else:
+                        salida = salida + '%s%s<-' % ( rangocentro, 
+                                        rangoderecha )
             elif tipoDer == 'e':
                 salida = salida + '%s{%s}' % ( rangocentro, 
                                     rangoderecha )
