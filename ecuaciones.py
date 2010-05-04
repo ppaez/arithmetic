@@ -33,6 +33,8 @@ def TipoValorDe( unaexpresion ):
 def feed( text ):
     'Feed text to the parser.  It is processed line by line.'
 
+    lines = []
+
     for linenumber, linea in enumerate( text.splitlines() ):
         salida = ''
         findelinea = linea
@@ -84,11 +86,11 @@ def feed( text ):
                 # no repetir lado izquierdo
                 if DerechaAntStart != izquierdaActStart or DerechaAntEnd != mIgualAct.start():
                     if tipoIzq in 'ifv':
-                        salida = salida + '[%s]' % ( rangoizquierda )
+                        salida = salida + '%s' % ( rangoizquierda )
                     elif tipoIzq == 'e':
-                        salida = salida + '{%s}' % ( rangoizquierda )
+                        salida = salida + '%s' % ( rangoizquierda )
                     else:
-                        salida = salida + '<%s>' % ( rangoizquierda )
+                        salida = salida + '%s' % ( rangoizquierda )
 
                 salida = salida + rangocentro
 
@@ -98,7 +100,7 @@ def feed( text ):
                 if tipoIzq == 'e' and tipoDer == 'v':    # evalua expresion
                     try:
                         rangoderecha = str( eval( valorIzq, globales ) )
-                        salida = salida + '[%s]' % ( rangoderecha )
+                        salida = salida + '%s<-' % ( rangoderecha )
                     except:
                         print 'eval error:', tipoIzq, valorIzq, tipoDer, valorDer
                 elif tipoIzq == 'n' and tipoDer == 'v' \
@@ -112,7 +114,7 @@ def feed( text ):
                   if valorIzq not in funciones:          # asigna a variable
                     try:
                         exec valorIzq + ' = lambda : ' + str(valorDer) in globales
-                        salida = salida + '[%s]' % ( rangoderecha )
+                        salida = salida + '%s' % ( rangoderecha )
                     except:
                         print 'exec error:', tipoIzq, valorIzq, tipoDer, valorDer
                         raise
@@ -130,7 +132,7 @@ def feed( text ):
                         exec valorIzq + ' = lambda : ' + str(valorDer) in globales
                         if '()' in valorDer and valorIzq not in funciones:
                             funciones.append( valorIzq )
-                        salida = salida + '{%s}' % ( rangoderecha )
+                        salida = salida + '%s' % ( rangoderecha )
                     except:
                         print 'exec error:', tipoIzq, valorIzq, tipoDer, valorDer
                         raise
@@ -139,12 +141,12 @@ def feed( text ):
                         exec valorIzq + ' = lambda : ' + str(valorDer) in globales
                         if '()' in valorDer and valorIzq not in funciones:
                             funciones.append( valorIzq )
-                        salida = salida + '<%s>' % ( rangoderecha )
+                        salida = salida + '%s' % ( rangoderecha )
                     except:
                         print 'exec error:', tipoIzq, valorIzq, tipoDer, valorDer
                         raise
                 else:
-                    salida = salida + '[%s]' % ( rangoderecha )
+                    salida = salida + '%s' % ( rangoderecha )
 
                 DerechaAntStart = mIgualAct.end()
                 DerechaAntEnd = DerechaActEnd
@@ -153,9 +155,12 @@ def feed( text ):
             mIgualAnt = mIgualAct
             mIgualAct = mIgualSig
 
-        print '%2s %s' % ( linenumber, salida + findelinea )
+        lines.append( salida + findelinea )
+
+    return '\n'.join( lines )
 
 
-import sys
-text = open( sys.argv[1] ).read()
-feed( text )
+if __name__ == '__main__':
+    import sys
+    text = open( sys.argv[1] ).read()
+    print feed( text )
