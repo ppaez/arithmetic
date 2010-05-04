@@ -85,14 +85,14 @@ def feed( text ):
                 if tipoIzq == 'e' and tipoDer == 'v':    # evalua expresion
                     try:
                         resultado = str( eval( valorIzq, globales ) )
-                        linea = linea[ :mIgualAct.end() ] + resultado + linea[ DerechaActEnd: ]
+                        linea = escribe( linea, mIgualAct.end(), DerechaActEnd, resultado, rangoderecha )
                     except:
                         print 'eval error:', tipoIzq, valorIzq, tipoDer, valorDer
                 elif tipoIzq == 'n' and tipoDer == 'v' \
                         and valorIzq in globales.keys(): # evalua variable o funcion
                     try: 
                         resultado = str( eval( valorIzq + '()', globales ) )
-                        linea = linea[ :mIgualAct.end() ] + resultado + linea[ DerechaActEnd: ]
+                        linea = escribe( linea, mIgualAct.end(), DerechaActEnd, resultado, rangoderecha )
                     except:
                         print 'eval error:', tipoIzq, valorIzq, tipoDer, valorDer
                 elif tipoIzq == 'n' and tipoDer in 'if':
@@ -106,10 +106,7 @@ def feed( text ):
                   else:                                  # evalua funcion
                     try:
                         resultado = str( eval( valorIzq + '()', globales ) )
-                        if resultado == rangoderecha:
-                            linea = linea[ :mIgualAct.end() ] + resultado + linea[ DerechaActEnd: ]
-                        else:
-                            linea = linea[ :mIgualAct.end() ] + resultado + '<-' + linea[ DerechaActEnd: ]
+                        linea = escribe( linea, mIgualAct.end(), DerechaActEnd, resultado, rangoderecha )
                     except:
                         print 'eval error:', tipoIzq, valorIzq, tipoDer, valorDer
                 elif tipoIzq == 'n' and tipoDer in 'e':  # define variable o funcion
@@ -144,7 +141,20 @@ def feed( text ):
     return '\n'.join( lines )
 
 
+def escribe( buffer, inicio, final, texto, referencia ):
+    'Regresa buffer con texto aplicado de inicio a final.'
+
+    if texto == referencia or not marcarCambios:
+        return buffer[ :inicio ] + texto + buffer[ final: ]
+    else:
+        return buffer[ :inicio ] + texto + '<-' + buffer[ final: ]
+
+marcarCambios = False
+
 if __name__ == '__main__':
     import sys
     text = open( sys.argv[1] ).read()
+    ' Segundo parametro indica marcar cambios.'
+    if len(sys.argv) > 2:
+        marcarCambios = True
     print feed( text )
