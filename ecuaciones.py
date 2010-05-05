@@ -85,14 +85,14 @@ def feed( text ):
                 if tipoIzq == 'e' and tipoDer == 'v':    # evalua expresion
                     try:
                         resultado = str( eval( valorIzq, globales ) )
-                        linea = escribe( linea, mIgualAct.end(), DerechaActEnd, resultado, rangoderecha )
+                        linea = escribe( linea, mIgualAct.end(), DerechaActEnd, resultado )
                     except:
                         print 'eval error:', tipoIzq, valorIzq, tipoDer, valorDer
                 elif tipoIzq == 'n' and tipoDer == 'v' \
                         and valorIzq in globales.keys(): # evalua variable o funcion
                     try: 
                         resultado = str( eval( valorIzq + '()', globales ) )
-                        linea = escribe( linea, mIgualAct.end(), DerechaActEnd, resultado, rangoderecha )
+                        linea = escribe( linea, mIgualAct.end(), DerechaActEnd, resultado )
                     except:
                         print 'eval error:', tipoIzq, valorIzq, tipoDer, valorDer
                 elif tipoIzq == 'n' and tipoDer in 'if':
@@ -106,7 +106,7 @@ def feed( text ):
                   else:                                  # evalua funcion
                     try:
                         resultado = str( eval( valorIzq + '()', globales ) )
-                        linea = escribe( linea, mIgualAct.end(), DerechaActEnd, resultado, rangoderecha )
+                        linea = escribe( linea, mIgualAct.end(), DerechaActEnd, resultado )
                     except:
                         print 'eval error:', tipoIzq, valorIzq, tipoDer, valorDer
                 elif tipoIzq == 'n' and tipoDer in 'e':  # define variable o funcion
@@ -141,9 +141,10 @@ def feed( text ):
     return '\n'.join( lines )
 
 
-def escribe( buffer, inicio, final, texto, referencia ):
+def escribe( buffer, inicio, final, texto ):
     'Regresa buffer con texto aplicado de inicio a final.'
 
+    referencia = buffer[ inicio : final ]
     if texto == referencia or not marcarCambios:
         return buffer[ :inicio ] + texto + buffer[ final: ]
     else:
