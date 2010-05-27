@@ -82,7 +82,7 @@ def feed( text ):
 
                 # hacer operaciones
 
-                if tipoIzq == 'e' and tipoDer == 'v':    # evalua expresion
+                if tipoIzq == 'e' and tipoDer in 'vif':    # evalua expresion
                     try:
                         resultado = str( eval( valorIzq, globales ) )
                         linea = escribe( linea, mIgualAct.end(), DerechaActEnd, resultado )
