@@ -1,4 +1,4 @@
-import re
+import re, aee
 
 reIgual = re.compile( ' ?= ?' )
 reSepar = re.compile( '  +' )
@@ -26,8 +26,9 @@ def TipoValorDe( unaexpresion ):
             for op in '+-*/':
                 if op in expresion_python:
                     expresion_python = expresion_python.replace( ' ', '' )
-                    expresion_python = re.sub( '([a-zA-Z][a-zA-Z0-9]*)', r'\1()', expresion_python )
-                    return 'e', expresion_python
+                    if re.search( '([a-zA-Z][a-zA-Z0-9]*)', expresion_python ):
+                        return 'e', expresion_python  # expression with names
+                    return 'a', expresion_python
             return 'n', unaexpresion.replace( ' ', '' )
 
 def feed( text ):
@@ -82,38 +83,54 @@ def feed( text ):
 
                 # hacer operaciones
 
-                if tipoIzq == 'e' and tipoDer in 'vif':    # evalua expresion
+                if tipoIzq in 'ea' and tipoDer in 'vif':    # evalua expresion
                     try:
-                        resultado = str( eval( valorIzq, globales ) )
+                        resultado = str( aee.evaluate( valorIzq ) )
                         linea = escribe( linea, mIgualAct.end(), DerechaActEnd, resultado )
                     except:
                         print 'eval error:', tipoIzq, valorIzq, tipoDer, valorDer
-                elif tipoIzq == 'n' and tipoDer == 'v' \
-                        and valorIzq in globales.keys(): # evalua variable o funcion
+                elif tipoIzq == 'n' and tipoDer == 'vNO' \
+                        and valorIzq in aee.variables: # evalua variable o funcion
                     try: 
-                        resultado = str( eval( valorIzq + '()', globales ) )
+                        resultado = str( aee.evaluate( valorIzq ) )
                         linea = escribe( linea, mIgualAct.end(), DerechaActEnd, resultado )
                     except:
                         print 'eval error:', tipoIzq, valorIzq, tipoDer, valorDer
-                elif tipoIzq == 'n' and tipoDer in 'if':
-                  if valorIzq not in funciones:          # asigna a variable
+                elif tipoIzq == 'n' and tipoDer in 'ifav':
+                  if valorIzq not in aee.functions:
+                   if tipoDer != 'v':      # asigna a variable
                     try:
-                        exec valorIzq + ' = lambda : ' + str(valorDer) in globales
+                        aee.variables[ valorIzq ] = str( aee.evaluate( str( valorDer) ) )
 
                     except:
                         print 'exec error:', tipoIzq, valorIzq, tipoDer, valorDer
                         raise
-                  else:                                  # evalua funcion
+                   else:                   # evalua variable
                     try:
-                        resultado = str( eval( valorIzq + '()', globales ) )
+                        resultado = aee.variables[ valorIzq ]
                         linea = escribe( linea, mIgualAct.end(), DerechaActEnd, resultado )
                     except:
                         print 'eval error:', tipoIzq, valorIzq, tipoDer, valorDer
-                elif tipoIzq == 'n' and tipoDer in 'e':  # define variable o funcion
+                        print linea
+                        raise
+                  else:                                  # evalua funcion
+                    if valorIzq not in aee.functions[ valorIzq ]:   # standard formula
+                        try:
+                            resultado = str( aee.evaluate( valorIzq ) )
+                            linea = escribe( linea, mIgualAct.end(), DerechaActEnd, resultado )
+                        except:
+                            print 'eval error:', tipoIzq, valorIzq, tipoDer, valorDer
+                    else:                                           # recurrence formula
+                        if valorIzq not in aee.variables:             # initial value
+                            aee.variables[ valorIzq ] = str( aee.evaluate( str( valorDer ) ) )
+                        else:                                         # iteration
+                            resultado = str( aee.evaluate( aee.functions[ valorIzq ] ) )
+                            linea = escribe( linea, mIgualAct.end(), DerechaActEnd, resultado )
+                            aee.variables[ valorIzq ] = resultado
+
+                elif tipoIzq == 'n' and tipoDer in 'e':  # define funcion
                     try:
-                        exec valorIzq + ' = lambda : ' + str(valorDer) in globales
-                        if '()' in valorDer and valorIzq not in funciones:
-                            funciones.append( valorIzq )
+                        aee.functions[ valorIzq ] = str(valorDer)
 
                     except:
                         print 'exec error:', tipoIzq, valorIzq, tipoDer, valorDer
@@ -133,6 +150,8 @@ def feed( text ):
                 DerechaAntStart = mIgualAct.end()
                 DerechaAntEnd = DerechaActEnd
 
+            if mIgualSig:
+                mIgualSig = reIgual.search( linea, mIgualAct.end() )
             mIgualAnt = mIgualAct
             mIgualAct = mIgualSig
 
