@@ -97,36 +97,36 @@ def feed( text ):
                     except:
                         print 'eval error:', tipoIzq, valorIzq, tipoDer, valorDer
                 elif tipoIzq == 'n' and tipoDer in 'ifav':
-                  if valorIzq not in aee.functions:
-                   if tipoDer != 'v':      # asigna a variable
-                    try:
-                        aee.variables[ valorIzq ] = str( aee.evaluate( str( valorDer) ) )
+                    if valorIzq not in aee.functions:      # variable
+                        if tipoDer != 'v':      # asigna a variable
+                            try:
+                                aee.variables[ valorIzq ] = str( aee.evaluate( str( valorDer) ) )
 
-                    except:
-                        print 'exec error:', tipoIzq, valorIzq, tipoDer, valorDer
-                        raise
-                   else:                   # evalua variable
-                    try:
-                        resultado = aee.variables[ valorIzq ]
-                        linea = escribe( linea, mIgualAct.end(), DerechaActEnd, resultado )
-                    except:
-                        print 'eval error:', tipoIzq, valorIzq, tipoDer, valorDer
-                        print linea
-                        raise
-                  else:                                  # evalua funcion
-                    if valorIzq not in aee.functions[ valorIzq ]:   # standard formula
-                        try:
-                            resultado = str( aee.evaluate( valorIzq ) )
-                            linea = escribe( linea, mIgualAct.end(), DerechaActEnd, resultado )
-                        except:
-                            print 'eval error:', tipoIzq, valorIzq, tipoDer, valorDer
-                    else:                                           # recurrence formula
-                        if valorIzq not in aee.variables:             # initial value
-                            aee.variables[ valorIzq ] = str( aee.evaluate( str( valorDer ) ) )
-                        else:                                         # iteration
-                            resultado = str( aee.evaluate( aee.functions[ valorIzq ] ) )
-                            linea = escribe( linea, mIgualAct.end(), DerechaActEnd, resultado )
-                            aee.variables[ valorIzq ] = resultado
+                            except:
+                                print 'exec error:', tipoIzq, valorIzq, tipoDer, valorDer
+                                raise
+                        else:                   # evalua variable
+                            try:
+                                resultado = aee.variables[ valorIzq ]
+                                linea = escribe( linea, mIgualAct.end(), DerechaActEnd, resultado )
+                            except:
+                                print 'eval error:', tipoIzq, valorIzq, tipoDer, valorDer
+                                print linea
+                                raise
+                    else:                       # evalua funcion
+                        if valorIzq not in aee.functions[ valorIzq ]:
+                            try:                     # standard formula
+                                resultado = str( aee.evaluate( valorIzq ) )
+                                linea = escribe( linea, mIgualAct.end(), DerechaActEnd, resultado )
+                            except:
+                                print 'eval error:', tipoIzq, valorIzq, tipoDer, valorDer
+                        else:                        # recurrence relation
+                            if valorIzq not in aee.variables:             # initial value
+                                aee.variables[ valorIzq ] = str( aee.evaluate( str( valorDer ) ) )
+                            else:                                         # iteration
+                                resultado = str( aee.evaluate( aee.functions[ valorIzq ] ) )
+                                linea = escribe( linea, mIgualAct.end(), DerechaActEnd, resultado )
+                                aee.variables[ valorIzq ] = resultado
 
                 elif tipoIzq == 'n' and tipoDer in 'e':  # define funcion
                     try:
