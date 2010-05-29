@@ -106,13 +106,14 @@ def feed( text ):
                                 print 'exec error:', tipoIzq, valorIzq, tipoDer, valorDer
                                 raise
                         else:                   # evalua variable
-                            try:
-                                resultado = aee.variables[ valorIzq ]
-                                linea = escribe( linea, mIgualAct.end(), DerechaActEnd, resultado )
-                            except:
-                                print 'eval error:', tipoIzq, valorIzq, tipoDer, valorDer
-                                print linea
-                                raise
+                            if valorIzq in aee.variables:
+                                try:
+                                    resultado = aee.variables[ valorIzq ]
+                                    linea = escribe( linea, mIgualAct.end(), DerechaActEnd, resultado )
+                                except:
+                                    print 'eval error:', tipoIzq, valorIzq, tipoDer, valorDer
+                                    print linea
+                                    raise
                     else:                       # evalua funcion
                         if valorIzq not in aee.functions[ valorIzq ]:
                             try:                     # standard formula
