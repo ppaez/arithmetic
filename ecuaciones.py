@@ -34,6 +34,10 @@ def TipoValorDe( unaexpresion ):
 def feed( text ):
     'Feed text to the parser.  It is processed line by line.'
 
+    # Initialize
+    aee.functions = {}
+    aee.variables = {}
+
     lines = []
 
     for linenumber, linea in enumerate( text.splitlines() ):
