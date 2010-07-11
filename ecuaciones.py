@@ -75,11 +75,11 @@ def feed( text ):
             LeftActStart = max( LeftStarts )
 
             # Determine RightActEnd,
-            # the smaller of mEqualSignSig, mSeparRight, endofline
+            # the smaller of mEqualSignNext, mSeparRight, endofline
             RightEnds = []
-            mEqualSignSig = reEqualSign.search( linea, mEqualSignAct.end() )
-            if mEqualSignSig:
-                RightEnds.append( mEqualSignSig.start() )
+            mEqualSignNext = reEqualSign.search( linea, mEqualSignAct.end() )
+            if mEqualSignNext:
+                RightEnds.append( mEqualSignNext.start() )
             mSeparRight = reSepar.search( linea, mEqualSignAct.end() )
             if mSeparRight:
                 RightEnds.append( mSeparRight.start() )
@@ -165,10 +165,10 @@ def feed( text ):
                 RightPrevStart = mEqualSignAct.end()
                 RightPrevEnd = RightActEnd
 
-            if mEqualSignSig:
-                mEqualSignSig = reEqualSign.search( linea, mEqualSignAct.end() )
+            if mEqualSignNext:
+                mEqualSignNext = reEqualSign.search( linea, mEqualSignAct.end() )
             mEqualSignPrev = mEqualSignAct
-            mEqualSignAct  = mEqualSignSig
+            mEqualSignAct  = mEqualSignNext
 
         lines.append( linea )
 
