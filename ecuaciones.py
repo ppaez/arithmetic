@@ -54,20 +54,20 @@ def feed( text ):
 
     for linenumber, linea in enumerate( text.splitlines() ):
 
-        RightAntStart = 0
-        RightAntEnd = 0
-        mEqualSignAnt = re.search( '^', linea )
-        mEqualSignAct = reEqualSign.search( linea, mEqualSignAnt.end() )
+        RightPrevStart = 0
+        RightPrevEnd = 0
+        mEqualSignPrev = re.search( '^', linea )
+        mEqualSignAct = reEqualSign.search( linea, mEqualSignPrev.end() )
         while mEqualSignAct:
 
             # Determine LeftActStart,
-            # the larger of mEqualSignAnt, mSeparLeft, mColonLeft, beginofline
+            # the larger of mEqualSignPrev, mSeparLeft, mColonLeft, beginofline
             LeftStarts = []
-            LeftStarts.append( mEqualSignAnt.end() )
-            mSeparLeft = reSepar.search( linea, mEqualSignAnt.end(), mEqualSignAct.start() )
+            LeftStarts.append( mEqualSignPrev.end() )
+            mSeparLeft = reSepar.search( linea, mEqualSignPrev.end(), mEqualSignAct.start() )
             if mSeparLeft:
                 LeftStarts.append( mSeparLeft.end() )
-            mColonLeft = reColonLeft.search( linea, mEqualSignAnt.end(), mEqualSignAct.start() )
+            mColonLeft = reColonLeft.search( linea, mEqualSignPrev.end(), mEqualSignAct.start() )
             if mColonLeft:
                 LeftStarts.append( mColonLeft.end() )
             mBeginOfLine = re.search( '^ *', linea )
@@ -87,9 +87,9 @@ def feed( text ):
             RightEnds.append( mEndOfLine.start() )
             RightActEnd = min( RightEnds )
 
-            rangolibre     = linea[ RightAntEnd     : LeftActStart ]
-            rangoLeft = linea[ LeftActStart : mEqualSignAct.start() ]
-            rangocentro    = linea[ mEqualSignAct.start() : mEqualSignAct.end() ]
+            rangolibre   = linea[ RightPrevEnd          : LeftActStart ]
+            rangoLeft    = linea[ LeftActStart          : mEqualSignAct.start() ]
+            rangocentro  = linea[ mEqualSignAct.start() : mEqualSignAct.end() ]
             rangoRight   = linea[ mEqualSignAct.end()   : RightActEnd ]
 
             tipoLeft, valorLeft = TypeAndValueOf( rangoLeft )
@@ -162,13 +162,13 @@ def feed( text ):
 
 
 
-                RightAntStart = mEqualSignAct.end()
-                RightAntEnd = RightActEnd
+                RightPrevStart = mEqualSignAct.end()
+                RightPrevEnd = RightActEnd
 
             if mEqualSignSig:
                 mEqualSignSig = reEqualSign.search( linea, mEqualSignAct.end() )
-            mEqualSignAnt = mEqualSignAct
-            mEqualSignAct = mEqualSignSig
+            mEqualSignPrev = mEqualSignAct
+            mEqualSignAct  = mEqualSignSig
 
         lines.append( linea )
 
