@@ -60,7 +60,7 @@ def feed( text ):
         mIgualAct = reIgual.search( linea, mIgualAnt.end() )
         while mIgualAct:
 
-            # Determina izquierdaActStart
+            # Determine izquierdaActStart,
             # the larger of mIgualAnt, mSeparIzq, mDospuntosIzq, beginofline
             IzquierdaStarts = []
             IzquierdaStarts.append( mIgualAnt.end() )
@@ -74,7 +74,7 @@ def feed( text ):
             IzquierdaStarts.append( mBeginOfLine.end() )
             izquierdaActStart = max( IzquierdaStarts )
 
-            # Determina DerechaActEnd
+            # Determine DerechaActEnd,
             # the smaller of mIgualSig, mSeparDer, endofline
             DerechaEnds = []
             mIgualSig = reIgual.search( linea, mIgualAct.end() )
@@ -95,33 +95,33 @@ def feed( text ):
             tipoIzq, valorIzq = TypeAndValueOf( rangoizquierda )
             tipoDer, valorDer = TypeAndValueOf( rangoderecha )
 
-            if tipoIzq != 'v': # si hay algo en la izquierda
+            if tipoIzq != 'v': # there is something to the left
 
-                # hacer operaciones
+                # perform operations
 
-                if tipoIzq in 'ea' and tipoDer in 'vif':    # evalua expresion
+                if tipoIzq in 'ea' and tipoDer in 'vif':   # evaluate expression
                     try:
                         resultado = str( aee.evaluate( valorIzq ) )
                         linea = writeResult( linea, mIgualAct.end(), DerechaActEnd, resultado )
                     except:
                         print 'eval error:', tipoIzq, valorIzq, tipoDer, valorDer
                 elif tipoIzq == 'n' and tipoDer == 'vNO' \
-                        and valorIzq in aee.variables: # evalua variable o funcion
+                        and valorIzq in aee.variables:     # evaluate variable or function
                     try: 
                         resultado = str( aee.evaluate( valorIzq ) )
                         linea = writeResult( linea, mIgualAct.end(), DerechaActEnd, resultado )
                     except:
                         print 'eval error:', tipoIzq, valorIzq, tipoDer, valorDer
                 elif tipoIzq == 'n' and tipoDer in 'ifav':
-                    if valorIzq not in aee.functions:      # variable
-                        if tipoDer != 'v':      # asigna a variable
+                    if valorIzq not in aee.functions:      # variable on the left
+                        if tipoDer != 'v':      # assign to variable
                             try:
                                 aee.variables[ valorIzq ] = str( aee.evaluate( str( valorDer) ) )
 
                             except:
                                 print 'exec error:', tipoIzq, valorIzq, tipoDer, valorDer
                                 raise
-                        else:                   # evalua variable
+                        else:                   # evaluate a variable
                             if valorIzq in aee.variables:
                                 try:
                                     resultado = aee.variables[ valorIzq ]
@@ -130,14 +130,14 @@ def feed( text ):
                                     print 'eval error:', tipoIzq, valorIzq, tipoDer, valorDer
                                     print linea
                                     raise
-                    else:                       # evalua funcion
+                    else:                                  # function on the left: evaluate
                         if valorIzq not in aee.functions[ valorIzq ]:
-                            try:                     # standard formula
+                            try:                # standard formula
                                 resultado = str( aee.evaluate( valorIzq ) )
                                 linea = writeResult( linea, mIgualAct.end(), DerechaActEnd, resultado )
                             except:
                                 print 'eval error:', tipoIzq, valorIzq, tipoDer, valorDer
-                        else:                        # recurrence relation
+                        else:                   # recurrence relation
                             if valorIzq not in aee.variables:             # initial value
                                 aee.variables[ valorIzq ] = str( aee.evaluate( str( valorDer ) ) )
                             else:                                         # iteration
@@ -145,14 +145,14 @@ def feed( text ):
                                 linea = writeResult( linea, mIgualAct.end(), DerechaActEnd, resultado )
                                 aee.variables[ valorIzq ] = resultado
 
-                elif tipoIzq == 'n' and tipoDer in 'e':  # define funcion
+                elif tipoIzq == 'n' and tipoDer in 'e':    # define a function
                     try:
                         aee.functions[ valorIzq ] = str(valorDer)
 
                     except:
                         print 'exec error:', tipoIzq, valorIzq, tipoDer, valorDer
                         raise
-                elif tipoIzq == 'n' and tipoDer in 'n':  # define alias
+                elif tipoIzq == 'n' and tipoDer in 'n':    # define an alias
                     try:
                         aee.functions[ valorIzq ] = str(valorDer)
 
