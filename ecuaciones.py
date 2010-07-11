@@ -54,46 +54,46 @@ def feed( text ):
 
     for linenumber, linea in enumerate( text.splitlines() ):
 
-        DerechaAntStart = 0
-        DerechaAntEnd = 0
+        RightAntStart = 0
+        RightAntEnd = 0
         mIgualAnt = re.search( '^', linea )
         mIgualAct = reIgual.search( linea, mIgualAnt.end() )
         while mIgualAct:
 
-            # Determine izquierdaActStart,
+            # Determine LeftActStart,
             # the larger of mIgualAnt, mSeparIzq, mDospuntosIzq, beginofline
-            IzquierdaStarts = []
-            IzquierdaStarts.append( mIgualAnt.end() )
+            LeftStarts = []
+            LeftStarts.append( mIgualAnt.end() )
             mSeparIzq = reSepar.search( linea, mIgualAnt.end(), mIgualAct.start() )
             if mSeparIzq:
-                IzquierdaStarts.append( mSeparIzq.end() )
+                LeftStarts.append( mSeparIzq.end() )
             mDospuntosIzq = reDospuntosIzq.search( linea, mIgualAnt.end(), mIgualAct.start() )
             if mDospuntosIzq:
-                IzquierdaStarts.append( mDospuntosIzq.end() )
+                LeftStarts.append( mDospuntosIzq.end() )
             mBeginOfLine = re.search( '^ *', linea )
-            IzquierdaStarts.append( mBeginOfLine.end() )
-            izquierdaActStart = max( IzquierdaStarts )
+            LeftStarts.append( mBeginOfLine.end() )
+            LeftActStart = max( LeftStarts )
 
-            # Determine DerechaActEnd,
+            # Determine RightActEnd,
             # the smaller of mIgualSig, mSeparDer, endofline
-            DerechaEnds = []
+            RightEnds = []
             mIgualSig = reIgual.search( linea, mIgualAct.end() )
             if mIgualSig:
-                DerechaEnds.append( mIgualSig.start() )
+                RightEnds.append( mIgualSig.start() )
             mSeparDer = reSepar.search( linea, mIgualAct.end() )
             if mSeparDer:
-                DerechaEnds.append( mSeparDer.start() )
+                RightEnds.append( mSeparDer.start() )
             mEndOfLine = re.search( ' *$', linea )
-            DerechaEnds.append( mEndOfLine.start() )
-            DerechaActEnd = min( DerechaEnds )
+            RightEnds.append( mEndOfLine.start() )
+            RightActEnd = min( RightEnds )
 
-            rangolibre     = linea[ DerechaAntEnd     : izquierdaActStart ]
-            rangoizquierda = linea[ izquierdaActStart : mIgualAct.start() ]
+            rangolibre     = linea[ RightAntEnd     : LeftActStart ]
+            rangoLeft = linea[ LeftActStart : mIgualAct.start() ]
             rangocentro    = linea[ mIgualAct.start() : mIgualAct.end() ]
-            rangoderecha   = linea[ mIgualAct.end()   : DerechaActEnd ] 
+            rangoRight   = linea[ mIgualAct.end()   : RightActEnd ]
 
-            tipoIzq, valorIzq = TypeAndValueOf( rangoizquierda )
-            tipoDer, valorDer = TypeAndValueOf( rangoderecha )
+            tipoIzq, valorIzq = TypeAndValueOf( rangoLeft )
+            tipoDer, valorDer = TypeAndValueOf( rangoRight )
 
             if tipoIzq != 'v': # there is something to the left
 
@@ -102,14 +102,14 @@ def feed( text ):
                 if tipoIzq in 'ea' and tipoDer in 'vif':   # evaluate expression
                     try:
                         resultado = str( aee.evaluate( valorIzq ) )
-                        linea = writeResult( linea, mIgualAct.end(), DerechaActEnd, resultado )
+                        linea = writeResult( linea, mIgualAct.end(), RightActEnd, resultado )
                     except:
                         print 'eval error:', tipoIzq, valorIzq, tipoDer, valorDer
                 elif tipoIzq == 'n' and tipoDer == 'vNO' \
                         and valorIzq in aee.variables:     # evaluate variable or function
                     try: 
                         resultado = str( aee.evaluate( valorIzq ) )
-                        linea = writeResult( linea, mIgualAct.end(), DerechaActEnd, resultado )
+                        linea = writeResult( linea, mIgualAct.end(), RightActEnd, resultado )
                     except:
                         print 'eval error:', tipoIzq, valorIzq, tipoDer, valorDer
                 elif tipoIzq == 'n' and tipoDer in 'ifav':
@@ -125,7 +125,7 @@ def feed( text ):
                             if valorIzq in aee.variables:
                                 try:
                                     resultado = aee.variables[ valorIzq ]
-                                    linea = writeResult( linea, mIgualAct.end(), DerechaActEnd, resultado )
+                                    linea = writeResult( linea, mIgualAct.end(), RightActEnd, resultado )
                                 except:
                                     print 'eval error:', tipoIzq, valorIzq, tipoDer, valorDer
                                     print linea
@@ -134,7 +134,7 @@ def feed( text ):
                         if valorIzq not in aee.functions[ valorIzq ]:
                             try:                # standard formula
                                 resultado = str( aee.evaluate( valorIzq ) )
-                                linea = writeResult( linea, mIgualAct.end(), DerechaActEnd, resultado )
+                                linea = writeResult( linea, mIgualAct.end(), RightActEnd, resultado )
                             except:
                                 print 'eval error:', tipoIzq, valorIzq, tipoDer, valorDer
                         else:                   # recurrence relation
@@ -142,7 +142,7 @@ def feed( text ):
                                 aee.variables[ valorIzq ] = str( aee.evaluate( str( valorDer ) ) )
                             else:                                         # iteration
                                 resultado = str( aee.evaluate( aee.functions[ valorIzq ] ) )
-                                linea = writeResult( linea, mIgualAct.end(), DerechaActEnd, resultado )
+                                linea = writeResult( linea, mIgualAct.end(), RightActEnd, resultado )
                                 aee.variables[ valorIzq ] = resultado
 
                 elif tipoIzq == 'n' and tipoDer in 'e':    # define a function
@@ -162,8 +162,8 @@ def feed( text ):
 
 
 
-                DerechaAntStart = mIgualAct.end()
-                DerechaAntEnd = DerechaActEnd
+                RightAntStart = mIgualAct.end()
+                RightAntEnd = RightActEnd
 
             if mIgualSig:
                 mIgualSig = reIgual.search( linea, mIgualAct.end() )
