@@ -1,18 +1,17 @@
 import ecuaciones
 
 
-def openfile( event):
+def loadfile( event):
     text = open( sys.argv[1] ).read()
     texto.delete( '1.0', Tkinter.END )
     texto.insert( "1.0", text)
 
 
-def KeyHandler( event ):
-    if event.char=='\t':
-        text = texto.get( '1.0', Tkinter.END )
-        texto.delete( '1.0', Tkinter.END )
-        texto.insert( Tkinter.END, ecuaciones.feed( text ) )
-        return "break"
+def Recalculate( event ):
+    text = texto.get( '1.0', Tkinter.END )
+    texto.delete( '1.0', Tkinter.END )
+    texto.insert( Tkinter.END, ecuaciones.feed( text ) )
+    return "break"
 
 import Tkinter
 root = Tkinter.Tk()
@@ -20,8 +19,8 @@ texto = Tkinter.Text(root, height=40)
 texto.pack()
 texto['font'] = ("lucida console", 11)
 texto['wrap'] = Tkinter.NONE
-texto.bind('<Control-o>', openfile)
-texto.bind( '<Key>', KeyHandler)
+texto.bind('<Control-l>', loadfile)
+texto.bind( '<F5>', Recalculate)
 texto.focus_set()	
 
 import sys
