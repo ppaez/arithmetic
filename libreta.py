@@ -1,3 +1,5 @@
+#! /usr/bin/python
+
 import ecuaciones
 
 
@@ -26,6 +28,11 @@ def Recalculate( event ):
     texto.insert( Tkinter.END, ecuaciones.feed( text ) )
     texto.mark_set( 'insert', cursorPosition )
 
+def Quit( event ):
+    'End the application.'
+    root.quit()
+
+# Build a simple editor window
 import Tkinter
 root = Tkinter.Tk()
 texto = Tkinter.Text(root, height=40)
@@ -34,6 +41,7 @@ texto['font'] = ("lucida console", 11)
 texto['wrap'] = Tkinter.NONE
 texto.bind('<Control-l>', loadFile)
 texto.bind('<Control-s>', saveFile)
+texto.bind('<Control-q>', Quit)
 texto.bind( '<F5>', Recalculate)
 texto.focus_set()	
 
@@ -43,8 +51,6 @@ text = open( sys.argv[1] ).read()
 if len(sys.argv) > 2:
     ecuaciones.marcarCambios = True
 
-
 texto.insert( Tkinter.END, text )
-
 
 root.mainloop()
