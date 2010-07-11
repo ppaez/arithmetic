@@ -142,9 +142,7 @@ def feed( text ):
                         raise
                 elif tipoIzq == 'n' and tipoDer in 'n':  # define alias
                     try:
-                        exec valorIzq + ' = lambda : ' + str(valorDer) in globales
-                        if '()' in valorDer and valorIzq not in funciones:
-                            funciones.append( valorIzq )
+                        aee.functions[ valorIzq ] = str(valorDer)
 
                     except:
                         print 'exec error:', tipoIzq, valorIzq, tipoDer, valorDer
