@@ -166,18 +166,10 @@ def feed( text ):
 def escribe( buffer, inicio, final, texto ):
     'Regresa buffer con texto aplicado de inicio a final.'
 
-    referencia = buffer[ inicio : final ]
-    if texto == referencia or not marcarCambios:
-        return buffer[ :inicio ] + texto + buffer[ final: ]
-    else:
-        return buffer[ :inicio ] + texto + '<-' + buffer[ final: ]
+    return buffer[ :inicio ] + texto + buffer[ final: ]
 
-marcarCambios = False
 
 if __name__ == '__main__':
     import sys
     text = open( sys.argv[1] ).read()
-    ' Segundo parametro indica marcar cambios.'
-    if len(sys.argv) > 2:
-        marcarCambios = True
     print feed( text )
