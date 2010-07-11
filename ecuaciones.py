@@ -8,20 +8,32 @@ globales = { '__builtins__' : '' }
 funciones = []
 
 
-def TipoValorDe( unaexpresion ):
-    "Regresa tipo 'i', 'f', 'e', 'o' y valor."
+def TypeAndValueOf( expression ):
+    '''"Returns a (type, value) tuple.
+    
+    type may be:
+    
+    v = void
+    i = integer, f = float
+    e = expression containing variables
+    a = arithmetic expression, no variables
+    n = name
+    
+    value is expression with some modifications:
+    blank spaces and commas removed, x replaced by *,
+    % replaced by /100.'''
 
-    if not unaexpresion.strip():  # vacio
+    if not expression.strip():  # empty
         return 'v', ''
     try:
-        n = int( unaexpresion.replace( ',', '' ) )
+        n = int( expression.replace( ',', '' ) )
         return 'i', n
     except:
         try:
-            n = float( unaexpresion.replace( ',', '' ) )
+            n = float( expression.replace( ',', '' ) )
             return 'f', n
         except:
-            expresion_python = re.sub( r'\bx\b', '*', unaexpresion )
+            expresion_python = re.sub( r'\bx\b', '*', expression )
             expresion_python = re.sub( r'%', '/100.', expresion_python )
             for op in '+-*/':
                 if op in expresion_python:
@@ -29,7 +41,7 @@ def TipoValorDe( unaexpresion ):
                     if re.search( '([a-zA-Z][a-zA-Z0-9]*)', expresion_python ):
                         return 'e', expresion_python  # expression with names
                     return 'a', expresion_python
-            return 'n', unaexpresion.replace( ' ', '' )
+            return 'n', expression.replace( ' ', '' )
 
 def feed( text ):
     'Feed text to the parser.  It is processed line by line.'
@@ -80,8 +92,8 @@ def feed( text ):
             rangocentro    = linea[ mIgualAct.start() : mIgualAct.end() ]
             rangoderecha   = linea[ mIgualAct.end()   : DerechaActEnd ] 
 
-            tipoIzq, valorIzq = TipoValorDe( rangoizquierda )
-            tipoDer, valorDer = TipoValorDe( rangoderecha )
+            tipoIzq, valorIzq = TypeAndValueOf( rangoizquierda )
+            tipoDer, valorDer = TypeAndValueOf( rangoderecha )
 
             if tipoIzq != 'v': # si hay algo en la izquierda
 
@@ -90,14 +102,14 @@ def feed( text ):
                 if tipoIzq in 'ea' and tipoDer in 'vif':    # evalua expresion
                     try:
                         resultado = str( aee.evaluate( valorIzq ) )
-                        linea = escribe( linea, mIgualAct.end(), DerechaActEnd, resultado )
+                        linea = writeResult( linea, mIgualAct.end(), DerechaActEnd, resultado )
                     except:
                         print 'eval error:', tipoIzq, valorIzq, tipoDer, valorDer
                 elif tipoIzq == 'n' and tipoDer == 'vNO' \
                         and valorIzq in aee.variables: # evalua variable o funcion
                     try: 
                         resultado = str( aee.evaluate( valorIzq ) )
-                        linea = escribe( linea, mIgualAct.end(), DerechaActEnd, resultado )
+                        linea = writeResult( linea, mIgualAct.end(), DerechaActEnd, resultado )
                     except:
                         print 'eval error:', tipoIzq, valorIzq, tipoDer, valorDer
                 elif tipoIzq == 'n' and tipoDer in 'ifav':
@@ -113,7 +125,7 @@ def feed( text ):
                             if valorIzq in aee.variables:
                                 try:
                                     resultado = aee.variables[ valorIzq ]
-                                    linea = escribe( linea, mIgualAct.end(), DerechaActEnd, resultado )
+                                    linea = writeResult( linea, mIgualAct.end(), DerechaActEnd, resultado )
                                 except:
                                     print 'eval error:', tipoIzq, valorIzq, tipoDer, valorDer
                                     print linea
@@ -122,7 +134,7 @@ def feed( text ):
                         if valorIzq not in aee.functions[ valorIzq ]:
                             try:                     # standard formula
                                 resultado = str( aee.evaluate( valorIzq ) )
-                                linea = escribe( linea, mIgualAct.end(), DerechaActEnd, resultado )
+                                linea = writeResult( linea, mIgualAct.end(), DerechaActEnd, resultado )
                             except:
                                 print 'eval error:', tipoIzq, valorIzq, tipoDer, valorDer
                         else:                        # recurrence relation
@@ -130,7 +142,7 @@ def feed( text ):
                                 aee.variables[ valorIzq ] = str( aee.evaluate( str( valorDer ) ) )
                             else:                                         # iteration
                                 resultado = str( aee.evaluate( aee.functions[ valorIzq ] ) )
-                                linea = escribe( linea, mIgualAct.end(), DerechaActEnd, resultado )
+                                linea = writeResult( linea, mIgualAct.end(), DerechaActEnd, resultado )
                                 aee.variables[ valorIzq ] = resultado
 
                 elif tipoIzq == 'n' and tipoDer in 'e':  # define funcion
@@ -163,10 +175,10 @@ def feed( text ):
     return '\n'.join( lines )
 
 
-def escribe( buffer, inicio, final, texto ):
-    'Regresa buffer con texto aplicado de inicio a final.'
+def writeResult( buffer, start, end, text ):
+    'Return buffer with text applied from start to end offset.'
 
-    return buffer[ :inicio ] + texto + buffer[ final: ]
+    return buffer[ :start ] + text + buffer[ end: ]
 
 
 if __name__ == '__main__':
