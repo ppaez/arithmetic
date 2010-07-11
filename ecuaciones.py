@@ -2,7 +2,7 @@ import re, aee
 
 reIgual = re.compile( ' ?= ?' )
 reSepar = re.compile( '  +' )
-reDospuntosIzq = re.compile( ': ' )
+reDospuntosLeft = re.compile( ': ' )
 
 globales = { '__builtins__' : '' }
 funciones = []
@@ -61,15 +61,15 @@ def feed( text ):
         while mIgualAct:
 
             # Determine LeftActStart,
-            # the larger of mIgualAnt, mSeparIzq, mDospuntosIzq, beginofline
+            # the larger of mIgualAnt, mSeparLeft, mDospuntosLeft, beginofline
             LeftStarts = []
             LeftStarts.append( mIgualAnt.end() )
-            mSeparIzq = reSepar.search( linea, mIgualAnt.end(), mIgualAct.start() )
-            if mSeparIzq:
-                LeftStarts.append( mSeparIzq.end() )
-            mDospuntosIzq = reDospuntosIzq.search( linea, mIgualAnt.end(), mIgualAct.start() )
-            if mDospuntosIzq:
-                LeftStarts.append( mDospuntosIzq.end() )
+            mSeparLeft = reSepar.search( linea, mIgualAnt.end(), mIgualAct.start() )
+            if mSeparLeft:
+                LeftStarts.append( mSeparLeft.end() )
+            mDospuntosLeft = reDospuntosLeft.search( linea, mIgualAnt.end(), mIgualAct.start() )
+            if mDospuntosLeft:
+                LeftStarts.append( mDospuntosLeft.end() )
             mBeginOfLine = re.search( '^ *', linea )
             LeftStarts.append( mBeginOfLine.end() )
             LeftActStart = max( LeftStarts )
@@ -92,72 +92,72 @@ def feed( text ):
             rangocentro    = linea[ mIgualAct.start() : mIgualAct.end() ]
             rangoRight   = linea[ mIgualAct.end()   : RightActEnd ]
 
-            tipoIzq, valorIzq = TypeAndValueOf( rangoLeft )
+            tipoLeft, valorLeft = TypeAndValueOf( rangoLeft )
             tipoDer, valorDer = TypeAndValueOf( rangoRight )
 
-            if tipoIzq != 'v': # there is something to the left
+            if tipoLeft != 'v': # there is something to the left
 
                 # perform operations
 
-                if tipoIzq in 'ea' and tipoDer in 'vif':   # evaluate expression
+                if tipoLeft in 'ea' and tipoDer in 'vif':  # evaluate expression
                     try:
-                        resultado = str( aee.evaluate( valorIzq ) )
+                        resultado = str( aee.evaluate( valorLeft ) )
                         linea = writeResult( linea, mIgualAct.end(), RightActEnd, resultado )
                     except:
-                        print 'eval error:', tipoIzq, valorIzq, tipoDer, valorDer
-                elif tipoIzq == 'n' and tipoDer == 'vNO' \
-                        and valorIzq in aee.variables:     # evaluate variable or function
+                        print 'eval error:', tipoLeft, valorLeft, tipoDer, valorDer
+                elif tipoLeft == 'n' and tipoDer == 'vNO' \
+                        and valorLeft in aee.variables:    # evaluate variable or function
                     try: 
-                        resultado = str( aee.evaluate( valorIzq ) )
+                        resultado = str( aee.evaluate( valorLeft ) )
                         linea = writeResult( linea, mIgualAct.end(), RightActEnd, resultado )
                     except:
-                        print 'eval error:', tipoIzq, valorIzq, tipoDer, valorDer
-                elif tipoIzq == 'n' and tipoDer in 'ifav':
-                    if valorIzq not in aee.functions:      # variable on the left
+                        print 'eval error:', tipoLeft, valorLeft, tipoDer, valorDer
+                elif tipoLeft == 'n' and tipoDer in 'ifav':
+                    if valorLeft not in aee.functions:     # variable on the left
                         if tipoDer != 'v':      # assign to variable
                             try:
-                                aee.variables[ valorIzq ] = str( aee.evaluate( str( valorDer) ) )
+                                aee.variables[ valorLeft ] = str( aee.evaluate( str( valorDer) ) )
 
                             except:
-                                print 'exec error:', tipoIzq, valorIzq, tipoDer, valorDer
+                                print 'exec error:', tipoLeft, valorLeft, tipoDer, valorDer
                                 raise
                         else:                   # evaluate a variable
-                            if valorIzq in aee.variables:
+                            if valorLeft in aee.variables:
                                 try:
-                                    resultado = aee.variables[ valorIzq ]
+                                    resultado = aee.variables[ valorLeft ]
                                     linea = writeResult( linea, mIgualAct.end(), RightActEnd, resultado )
                                 except:
-                                    print 'eval error:', tipoIzq, valorIzq, tipoDer, valorDer
+                                    print 'eval error:', tipoLeft, valorLeft, tipoDer, valorDer
                                     print linea
                                     raise
                     else:                                  # function on the left: evaluate
-                        if valorIzq not in aee.functions[ valorIzq ]:
+                        if valorLeft not in aee.functions[ valorLeft ]:
                             try:                # standard formula
-                                resultado = str( aee.evaluate( valorIzq ) )
+                                resultado = str( aee.evaluate( valorLeft ) )
                                 linea = writeResult( linea, mIgualAct.end(), RightActEnd, resultado )
                             except:
-                                print 'eval error:', tipoIzq, valorIzq, tipoDer, valorDer
+                                print 'eval error:', tipoLeft, valorLeft, tipoDer, valorDer
                         else:                   # recurrence relation
-                            if valorIzq not in aee.variables:             # initial value
-                                aee.variables[ valorIzq ] = str( aee.evaluate( str( valorDer ) ) )
+                            if valorLeft not in aee.variables:            # initial value
+                                aee.variables[ valorLeft ] = str( aee.evaluate( str( valorDer ) ) )
                             else:                                         # iteration
-                                resultado = str( aee.evaluate( aee.functions[ valorIzq ] ) )
+                                resultado = str( aee.evaluate( aee.functions[ valorLeft ] ) )
                                 linea = writeResult( linea, mIgualAct.end(), RightActEnd, resultado )
-                                aee.variables[ valorIzq ] = resultado
+                                aee.variables[ valorLeft ] = resultado
 
-                elif tipoIzq == 'n' and tipoDer in 'e':    # define a function
+                elif tipoLeft == 'n' and tipoDer in 'e':   # define a function
                     try:
-                        aee.functions[ valorIzq ] = str(valorDer)
+                        aee.functions[ valorLeft ] = str(valorDer)
 
                     except:
-                        print 'exec error:', tipoIzq, valorIzq, tipoDer, valorDer
+                        print 'exec error:', tipoLeft, valorLeft, tipoDer, valorDer
                         raise
-                elif tipoIzq == 'n' and tipoDer in 'n':    # define an alias
+                elif tipoLeft == 'n' and tipoDer in 'n':   # define an alias
                     try:
-                        aee.functions[ valorIzq ] = str(valorDer)
+                        aee.functions[ valorLeft ] = str(valorDer)
 
                     except:
-                        print 'exec error:', tipoIzq, valorIzq, tipoDer, valorDer
+                        print 'exec error:', tipoLeft, valorLeft, tipoDer, valorDer
                         raise
 
 
