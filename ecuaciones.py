@@ -52,45 +52,45 @@ def feed( text ):
 
     lines = []
 
-    for linenumber, linea in enumerate( text.splitlines() ):
+    for linenumber, line in enumerate( text.splitlines() ):
 
         RightPrevStart = 0
         RightPrevEnd = 0
-        mEqualSignPrev = re.search( '^', linea )
-        mEqualSignAct = reEqualSign.search( linea, mEqualSignPrev.end() )
+        mEqualSignPrev = re.search( '^', line )
+        mEqualSignAct = reEqualSign.search( line, mEqualSignPrev.end() )
         while mEqualSignAct:
 
             # Determine LeftActStart,
             # the larger of mEqualSignPrev, mSeparLeft, mColonLeft, beginofline
             LeftStarts = []
             LeftStarts.append( mEqualSignPrev.end() )
-            mSeparLeft = reSepar.search( linea, mEqualSignPrev.end(), mEqualSignAct.start() )
+            mSeparLeft = reSepar.search( line, mEqualSignPrev.end(), mEqualSignAct.start() )
             if mSeparLeft:
                 LeftStarts.append( mSeparLeft.end() )
-            mColonLeft = reColonLeft.search( linea, mEqualSignPrev.end(), mEqualSignAct.start() )
+            mColonLeft = reColonLeft.search( line, mEqualSignPrev.end(), mEqualSignAct.start() )
             if mColonLeft:
                 LeftStarts.append( mColonLeft.end() )
-            mBeginOfLine = re.search( '^ *', linea )
+            mBeginOfLine = re.search( '^ *', line )
             LeftStarts.append( mBeginOfLine.end() )
             LeftActStart = max( LeftStarts )
 
             # Determine RightActEnd,
             # the smaller of mEqualSignNext, mSeparRight, endofline
             RightEnds = []
-            mEqualSignNext = reEqualSign.search( linea, mEqualSignAct.end() )
+            mEqualSignNext = reEqualSign.search( line, mEqualSignAct.end() )
             if mEqualSignNext:
                 RightEnds.append( mEqualSignNext.start() )
-            mSeparRight = reSepar.search( linea, mEqualSignAct.end() )
+            mSeparRight = reSepar.search( line, mEqualSignAct.end() )
             if mSeparRight:
                 RightEnds.append( mSeparRight.start() )
-            mEndOfLine = re.search( ' *$', linea )
+            mEndOfLine = re.search( ' *$', line )
             RightEnds.append( mEndOfLine.start() )
             RightActEnd = min( RightEnds )
 
-            rangolibre   = linea[ RightPrevEnd          : LeftActStart ]
-            rangoLeft    = linea[ LeftActStart          : mEqualSignAct.start() ]
-            rangocentro  = linea[ mEqualSignAct.start() : mEqualSignAct.end() ]
-            rangoRight   = linea[ mEqualSignAct.end()   : RightActEnd ]
+            rangolibre   = line[ RightPrevEnd          : LeftActStart ]
+            rangoLeft    = line[ LeftActStart          : mEqualSignAct.start() ]
+            rangocentro  = line[ mEqualSignAct.start() : mEqualSignAct.end() ]
+            rangoRight   = line[ mEqualSignAct.end()   : RightActEnd ]
 
             tipoLeft, valorLeft = TypeAndValueOf( rangoLeft )
             tipoRight, valorRight = TypeAndValueOf( rangoRight )
@@ -102,14 +102,14 @@ def feed( text ):
                 if tipoLeft in 'ea' and tipoRight in 'vif':# evaluate expression
                     try:
                         resultado = str( aee.evaluate( valorLeft ) )
-                        linea = writeResult( linea, mEqualSignAct.end(), RightActEnd, resultado )
+                        line = writeResult( line, mEqualSignAct.end(), RightActEnd, resultado )
                     except:
                         print 'eval error:', tipoLeft, valorLeft, tipoRight, valorRight
                 elif tipoLeft == 'n' and tipoRight == 'vNO' \
                         and valorLeft in aee.variables:    # evaluate variable or function
                     try: 
                         resultado = str( aee.evaluate( valorLeft ) )
-                        linea = writeResult( linea, mEqualSignAct.end(), RightActEnd, resultado )
+                        line = writeResult( line, mEqualSignAct.end(), RightActEnd, resultado )
                     except:
                         print 'eval error:', tipoLeft, valorLeft, tipoRight, valorRight
                 elif tipoLeft == 'n' and tipoRight in 'ifav':
@@ -125,16 +125,16 @@ def feed( text ):
                             if valorLeft in aee.variables:
                                 try:
                                     resultado = aee.variables[ valorLeft ]
-                                    linea = writeResult( linea, mEqualSignAct.end(), RightActEnd, resultado )
+                                    line = writeResult( line, mEqualSignAct.end(), RightActEnd, resultado )
                                 except:
                                     print 'eval error:', tipoLeft, valorLeft, tipoRight, valorRight
-                                    print linea
+                                    print line
                                     raise
                     else:                                  # function on the left: evaluate
                         if valorLeft not in aee.functions[ valorLeft ]:
                             try:                # standard formula
                                 resultado = str( aee.evaluate( valorLeft ) )
-                                linea = writeResult( linea, mEqualSignAct.end(), RightActEnd, resultado )
+                                line = writeResult( line, mEqualSignAct.end(), RightActEnd, resultado )
                             except:
                                 print 'eval error:', tipoLeft, valorLeft, tipoRight, valorRight
                         else:                   # recurrence relation
@@ -142,7 +142,7 @@ def feed( text ):
                                 aee.variables[ valorLeft ] = str( aee.evaluate( str( valorRight ) ) )
                             else:                                         # iteration
                                 resultado = str( aee.evaluate( aee.functions[ valorLeft ] ) )
-                                linea = writeResult( linea, mEqualSignAct.end(), RightActEnd, resultado )
+                                line = writeResult( line, mEqualSignAct.end(), RightActEnd, resultado )
                                 aee.variables[ valorLeft ] = resultado
 
                 elif tipoLeft == 'n' and tipoRight in 'e': # define a function
@@ -166,11 +166,11 @@ def feed( text ):
                 RightPrevEnd = RightActEnd
 
             if mEqualSignNext:
-                mEqualSignNext = reEqualSign.search( linea, mEqualSignAct.end() )
+                mEqualSignNext = reEqualSign.search( line, mEqualSignAct.end() )
             mEqualSignPrev = mEqualSignAct
             mEqualSignAct  = mEqualSignNext
 
-        lines.append( linea )
+        lines.append( line )
 
     return '\n'.join( lines )
 
