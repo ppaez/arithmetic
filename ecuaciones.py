@@ -75,14 +75,14 @@ def feed( text ):
             LeftActStart = max( LeftStarts )
 
             # Determine RightActEnd,
-            # the smaller of mIgualSig, mSeparDer, endofline
+            # the smaller of mIgualSig, mSeparRight, endofline
             RightEnds = []
             mIgualSig = reIgual.search( linea, mIgualAct.end() )
             if mIgualSig:
                 RightEnds.append( mIgualSig.start() )
-            mSeparDer = reSepar.search( linea, mIgualAct.end() )
-            if mSeparDer:
-                RightEnds.append( mSeparDer.start() )
+            mSeparRight = reSepar.search( linea, mIgualAct.end() )
+            if mSeparRight:
+                RightEnds.append( mSeparRight.start() )
             mEndOfLine = re.search( ' *$', linea )
             RightEnds.append( mEndOfLine.start() )
             RightActEnd = min( RightEnds )
@@ -93,33 +93,33 @@ def feed( text ):
             rangoRight   = linea[ mIgualAct.end()   : RightActEnd ]
 
             tipoLeft, valorLeft = TypeAndValueOf( rangoLeft )
-            tipoDer, valorDer = TypeAndValueOf( rangoRight )
+            tipoRight, valorRight = TypeAndValueOf( rangoRight )
 
             if tipoLeft != 'v': # there is something to the left
 
                 # perform operations
 
-                if tipoLeft in 'ea' and tipoDer in 'vif':  # evaluate expression
+                if tipoLeft in 'ea' and tipoRight in 'vif':# evaluate expression
                     try:
                         resultado = str( aee.evaluate( valorLeft ) )
                         linea = writeResult( linea, mIgualAct.end(), RightActEnd, resultado )
                     except:
-                        print 'eval error:', tipoLeft, valorLeft, tipoDer, valorDer
-                elif tipoLeft == 'n' and tipoDer == 'vNO' \
+                        print 'eval error:', tipoLeft, valorLeft, tipoRight, valorRight
+                elif tipoLeft == 'n' and tipoRight == 'vNO' \
                         and valorLeft in aee.variables:    # evaluate variable or function
                     try: 
                         resultado = str( aee.evaluate( valorLeft ) )
                         linea = writeResult( linea, mIgualAct.end(), RightActEnd, resultado )
                     except:
-                        print 'eval error:', tipoLeft, valorLeft, tipoDer, valorDer
-                elif tipoLeft == 'n' and tipoDer in 'ifav':
+                        print 'eval error:', tipoLeft, valorLeft, tipoRight, valorRight
+                elif tipoLeft == 'n' and tipoRight in 'ifav':
                     if valorLeft not in aee.functions:     # variable on the left
-                        if tipoDer != 'v':      # assign to variable
+                        if tipoRight != 'v':    # assign to variable
                             try:
-                                aee.variables[ valorLeft ] = str( aee.evaluate( str( valorDer) ) )
+                                aee.variables[ valorLeft ] = str( aee.evaluate( str( valorRight) ) )
 
                             except:
-                                print 'exec error:', tipoLeft, valorLeft, tipoDer, valorDer
+                                print 'exec error:', tipoLeft, valorLeft, tipoRight, valorRight
                                 raise
                         else:                   # evaluate a variable
                             if valorLeft in aee.variables:
@@ -127,7 +127,7 @@ def feed( text ):
                                     resultado = aee.variables[ valorLeft ]
                                     linea = writeResult( linea, mIgualAct.end(), RightActEnd, resultado )
                                 except:
-                                    print 'eval error:', tipoLeft, valorLeft, tipoDer, valorDer
+                                    print 'eval error:', tipoLeft, valorLeft, tipoRight, valorRight
                                     print linea
                                     raise
                     else:                                  # function on the left: evaluate
@@ -136,28 +136,28 @@ def feed( text ):
                                 resultado = str( aee.evaluate( valorLeft ) )
                                 linea = writeResult( linea, mIgualAct.end(), RightActEnd, resultado )
                             except:
-                                print 'eval error:', tipoLeft, valorLeft, tipoDer, valorDer
+                                print 'eval error:', tipoLeft, valorLeft, tipoRight, valorRight
                         else:                   # recurrence relation
                             if valorLeft not in aee.variables:            # initial value
-                                aee.variables[ valorLeft ] = str( aee.evaluate( str( valorDer ) ) )
+                                aee.variables[ valorLeft ] = str( aee.evaluate( str( valorRight ) ) )
                             else:                                         # iteration
                                 resultado = str( aee.evaluate( aee.functions[ valorLeft ] ) )
                                 linea = writeResult( linea, mIgualAct.end(), RightActEnd, resultado )
                                 aee.variables[ valorLeft ] = resultado
 
-                elif tipoLeft == 'n' and tipoDer in 'e':   # define a function
+                elif tipoLeft == 'n' and tipoRight in 'e': # define a function
                     try:
-                        aee.functions[ valorLeft ] = str(valorDer)
+                        aee.functions[ valorLeft ] = str(valorRight)
 
                     except:
-                        print 'exec error:', tipoLeft, valorLeft, tipoDer, valorDer
+                        print 'exec error:', tipoLeft, valorLeft, tipoRight, valorRight
                         raise
-                elif tipoLeft == 'n' and tipoDer in 'n':   # define an alias
+                elif tipoLeft == 'n' and tipoRight in 'n': # define an alias
                     try:
-                        aee.functions[ valorLeft ] = str(valorDer)
+                        aee.functions[ valorLeft ] = str(valorRight)
 
                     except:
-                        print 'exec error:', tipoLeft, valorLeft, tipoDer, valorDer
+                        print 'exec error:', tipoLeft, valorLeft, tipoRight, valorRight
                         raise
 
 
