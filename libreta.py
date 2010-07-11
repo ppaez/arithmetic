@@ -7,14 +7,14 @@ def loadFile( event):
     'Load file content into the buffer.'
 
     cursorPosition = texto.index( 'insert' )
-    text = open( sys.argv[1] ).read()
+    text = open( filename ).read()
     texto.delete( '1.0', Tkinter.END )
     texto.insert( "1.0", text)
     texto.mark_set( 'insert', cursorPosition )
 
 def saveFile( event):
     'Save the text buffer contents.'
-    text = open( sys.argv[1], 'w' )
+    text = open( filename, 'w' )
     text.write( texto.get( '1.0', Tkinter.END  ) )
 
 def Recalculate( event ):
@@ -46,11 +46,12 @@ texto.bind( '<F5>', Recalculate)
 texto.focus_set()	
 
 import sys
-text = open( sys.argv[1] ).read()
-' Segundo parametro indica marcar cambios.'
-if len(sys.argv) > 2:
-    ecuaciones.marcarCambios = True
-
-texto.insert( Tkinter.END, text )
+if len(sys.argv) > 1:
+    filename = sys.argv[1]
+    try:
+        text = open( filename ).read()
+        texto.insert( Tkinter.END, text )
+    except:
+        pass  # new file
 
 root.mainloop()
