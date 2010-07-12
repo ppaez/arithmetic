@@ -1,6 +1,6 @@
 #! /usr/bin/python
 
-import ecuaciones
+import arithmetic
 
 
 def loadFile( event):
@@ -25,7 +25,7 @@ def Recalculate( event ):
     cursorPosition = texto.index( 'insert' )
     text = texto.get( '1.0', Tkinter.END )
     texto.delete( '1.0', Tkinter.END )
-    texto.insert( Tkinter.END, ecuaciones.feed( text ) )
+    texto.insert( Tkinter.END, arithmetic.feed( text ) )
     texto.mark_set( 'insert', cursorPosition )
 
 def Quit( event ):
@@ -58,7 +58,7 @@ if len(sys.argv) > 1:
         pass  # new file
 else:
     filename = 'unnammed'
-root.title( 'Libreta 0.1 - ' + filename )
+root.title( filename + ' - Libreta 0.1' )
 
 
 root.mainloop()
