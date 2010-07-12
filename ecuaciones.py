@@ -1,4 +1,158 @@
-import re, aee
+import re
+
+# Written by the equation processor, read by evaluate():
+variables = {}
+functions = {}
+
+
+renumber = re.compile( r'([0-9][0-9,]*(\.[0-9]*)?%?)|(\.[0-9]+%?)' )
+reidentifier = re.compile( r'[a-zA-Z][a-zA-Z0-9_]*' )
+rexenclosed = re.compile( r'[0-9.](x)[^a-zA-Z]' )
+
+def gettoken( doc ):
+    '''Get next token from text and return it.
+    
+    Return None if no more text.
+    
+    doc has text and offset attributes.
+
+    Identifiers    letter ( letter | digit | _ )*
+    Numbers        digit ( digit | , | . ) *
+    Operators      - + * / ^ ** x
+    
+    x can be a name or an operator
+
+    x preceeded and followed by a digit is taken as if
+    preceeded and followed by a space.  i.e 5x3
+    is seen as 5 x 3.
+    '''
+    while doc.offset < len( doc.text ):
+        if doc.text[ doc.offset ] == ' ':
+            value = doc.text[ doc.offset ]
+            doc.offset = doc.offset + 1
+            continue
+        if doc.text[ doc.offset ] == '\n':
+            value = doc.text[ doc.offset ]
+            doc.offset = doc.offset + 1
+            return value
+        m = rexenclosed.match( doc.text, doc.offset - 1 )
+        if m:
+            value = m.group(1)
+            doc.offset = m.end(1)
+            return value
+        m = renumber.match( doc.text, doc.offset )
+        if m:
+            value = m.group()
+            doc.offset = m.end()
+            return value
+        m = reidentifier.match( doc.text, doc.offset )
+        if m:
+            value = m.group()
+            doc.offset = m.end()
+            return value
+        if doc.text[ doc.offset: doc.offset + 2 ] == '**':
+            value = doc.text[ doc.offset: doc.offset + 2 ]
+            doc.offset = doc.offset + 2
+            return value
+        if doc.text[ doc.offset ] in '+-*/^()':
+            value = doc.text[ doc.offset ]
+            doc.offset = doc.offset + 1
+            return value
+        value = doc.text[ doc.offset ] + '***' 
+        doc.offset = doc.offset + 1
+        return value
+    return None	
+
+
+t = ''
+from decimal import Decimal, getcontext
+getcontext().prec = 100
+
+def evaluate( expression_text ):
+    '''Parse expression, calculate and return its result.
+
+    '''
+    global text
+    global t
+    tokens = []
+    expression = []
+
+    class doc:
+        text = expression_text
+        offset = 0
+
+    def factor():
+        global t
+        if t in '-+':
+            expression.append( t )
+            t = gettoken( doc )
+        if re.search( '[0-9]+', t ) :
+            expression.append( t )
+            t = gettoken( doc )
+        elif t == '(':
+            expression.append( t )
+            t = gettoken( doc )
+            expr()
+            expression.append( t )
+            t = gettoken( doc )
+        elif re.search( '[a-zA-Z]+', t):
+            if variables.has_key( t ):
+                expression.append( variables[ t ] )
+                t = gettoken( doc )
+            elif functions.has_key( t ):
+                expression.append( str( evaluate( functions[ t ] ) ) )
+                t = gettoken( doc )
+            else:
+                expression.append( t + ' undefined' )
+                t = gettoken( doc )
+
+    def factors():
+        global t
+        if t == '^' or t == '**':
+            expression.append( '**' )
+            t = gettoken( doc )
+            power()
+
+    def power():
+        factor()
+        factors()
+
+    def powers():
+        global t
+        if t and t in '*x/':
+            expression.append( t.replace( 'x', '*') )
+            t = gettoken( doc )
+            power()
+            powers()
+
+    def term():
+        power()
+        powers()
+
+    def terms():
+        global t
+        if t and t in '-+':
+            expression.append( t )
+            t = gettoken( doc )
+            term()
+            terms()
+
+    def expr():
+        term()
+        terms()
+
+    t = gettoken( doc )
+    expr()
+
+    expressionD = []
+    for element in expression:
+        if element not in '+-x/^*()' or element == '**':
+            element = "Decimal('" + element + "')"
+        expressionD.append( element )
+
+    return eval( ''.join( expressionD ) )
+
+
 
 reEqualSign = re.compile( ' ?= ?' )
 reSepar = re.compile( '  +' )
@@ -46,9 +200,10 @@ def TypeAndValueOf( expression ):
 def feed( text ):
     'Feed text to the parser.  It is processed line by line.'
 
+    global functions, variables
     # Initialize
-    aee.functions = {}
-    aee.variables = {}
+    functions = {}
+    variables = {}
 
     lines = []
 
@@ -101,60 +256,60 @@ def feed( text ):
 
                 if tipoLeft in 'ea' and tipoRight in 'vif':# evaluate expression
                     try:
-                        resultado = str( aee.evaluate( valorLeft ) )
+                        resultado = str( evaluate( valorLeft ) )
                         line = writeResult( line, mEqualSignAct.end(), RightActEnd, resultado )
                     except:
                         print 'eval error:', tipoLeft, valorLeft, tipoRight, valorRight
                 elif tipoLeft == 'n' and tipoRight == 'vNO' \
-                        and valorLeft in aee.variables:    # evaluate variable or function
+                        and valorLeft in variables:    # evaluate variable or function
                     try: 
-                        resultado = str( aee.evaluate( valorLeft ) )
+                        resultado = str( evaluate( valorLeft ) )
                         line = writeResult( line, mEqualSignAct.end(), RightActEnd, resultado )
                     except:
                         print 'eval error:', tipoLeft, valorLeft, tipoRight, valorRight
                 elif tipoLeft == 'n' and tipoRight in 'ifav':
-                    if valorLeft not in aee.functions:     # variable on the left
+                    if valorLeft not in functions:     # variable on the left
                         if tipoRight != 'v':    # assign to variable
                             try:
-                                aee.variables[ valorLeft ] = str( aee.evaluate( str( valorRight) ) )
+                                variables[ valorLeft ] = str( evaluate( str( valorRight) ) )
 
                             except:
                                 print 'exec error:', tipoLeft, valorLeft, tipoRight, valorRight
                                 raise
                         else:                   # evaluate a variable
-                            if valorLeft in aee.variables:
+                            if valorLeft in variables:
                                 try:
-                                    resultado = aee.variables[ valorLeft ]
+                                    resultado = variables[ valorLeft ]
                                     line = writeResult( line, mEqualSignAct.end(), RightActEnd, resultado )
                                 except:
                                     print 'eval error:', tipoLeft, valorLeft, tipoRight, valorRight
                                     print line
                                     raise
                     else:                                  # function on the left: evaluate
-                        if valorLeft not in aee.functions[ valorLeft ]:
+                        if valorLeft not in functions[ valorLeft ]:
                             try:                # standard formula
-                                resultado = str( aee.evaluate( valorLeft ) )
+                                resultado = str( evaluate( valorLeft ) )
                                 line = writeResult( line, mEqualSignAct.end(), RightActEnd, resultado )
                             except:
                                 print 'eval error:', tipoLeft, valorLeft, tipoRight, valorRight
                         else:                   # recurrence relation
-                            if valorLeft not in aee.variables:            # initial value
-                                aee.variables[ valorLeft ] = str( aee.evaluate( str( valorRight ) ) )
+                            if valorLeft not in variables:            # initial value
+                                variables[ valorLeft ] = str( evaluate( str( valorRight ) ) )
                             else:                                         # iteration
-                                resultado = str( aee.evaluate( aee.functions[ valorLeft ] ) )
+                                resultado = str( evaluate( functions[ valorLeft ] ) )
                                 line = writeResult( line, mEqualSignAct.end(), RightActEnd, resultado )
-                                aee.variables[ valorLeft ] = resultado
+                                variables[ valorLeft ] = resultado
 
                 elif tipoLeft == 'n' and tipoRight in 'e': # define a function
                     try:
-                        aee.functions[ valorLeft ] = str(valorRight)
+                        functions[ valorLeft ] = str(valorRight)
 
                     except:
                         print 'exec error:', tipoLeft, valorLeft, tipoRight, valorRight
                         raise
                 elif tipoLeft == 'n' and tipoRight in 'n': # define an alias
                     try:
-                        aee.functions[ valorLeft ] = str(valorRight)
+                        functions[ valorLeft ] = str(valorRight)
 
                     except:
                         print 'exec error:', tipoLeft, valorLeft, tipoRight, valorRight
