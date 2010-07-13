@@ -278,13 +278,9 @@ def feed( text ):
                                 raise
                         else:                   # evaluate a variable
                             if valorLeft in variables:
-                                try:
                                     resultado = variables[ valorLeft ]
                                     line = writeResult( line, mEqualSignAct.end(), RightActEnd, resultado )
-                                except:
-                                    print 'eval error:', tipoLeft, valorLeft, tipoRight, valorRight
-                                    print line
-                                    raise
+
                     else:                                  # function on the left: evaluate
                         if valorLeft not in functions[ valorLeft ]:
                             try:                # standard formula
@@ -301,19 +297,10 @@ def feed( text ):
                                 variables[ valorLeft ] = resultado
 
                 elif tipoLeft == 'n' and tipoRight in 'e': # define a function
-                    try:
                         functions[ valorLeft ] = str(valorRight)
 
-                    except:
-                        print 'exec error:', tipoLeft, valorLeft, tipoRight, valorRight
-                        raise
                 elif tipoLeft == 'n' and tipoRight in 'n': # define an alias
-                    try:
                         functions[ valorLeft ] = str(valorRight)
-
-                    except:
-                        print 'exec error:', tipoLeft, valorLeft, tipoRight, valorRight
-                        raise
 
 
 
