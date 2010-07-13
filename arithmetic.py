@@ -260,13 +260,6 @@ def feed( text ):
                         line = writeResult( line, mEqualSignAct.end(), RightActEnd, resultado )
                     except:
                         print 'eval error:', tipoLeft, valorLeft, tipoRight, valorRight
-                elif tipoLeft == 'n' and tipoRight == 'vNO' \
-                        and valorLeft in variables:    # evaluate variable or function
-                    try: 
-                        resultado = str( evaluate( valorLeft ) )
-                        line = writeResult( line, mEqualSignAct.end(), RightActEnd, resultado )
-                    except:
-                        print 'eval error:', tipoLeft, valorLeft, tipoRight, valorRight
                 elif tipoLeft == 'n' and tipoRight in 'ifav':
                     if valorLeft not in functions:     # variable on the left
                         if tipoRight != 'v':    # assign to variable
