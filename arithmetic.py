@@ -283,6 +283,7 @@ def feed( text ):
                                 print 'eval error:', tipoLeft, valorLeft, tipoRight, valorRight
                         else:                   # recurrence relation
                             if valorLeft not in variables:            # initial value
+                              if valorRight != '':
                                 variables[ valorLeft ] = str( evaluate( str( valorRight ) ) )
                             else:                                         # iteration
                                 resultado = str( evaluate( functions[ valorLeft ] ) )
