@@ -328,6 +328,7 @@ def feed( text ):
                 if tipoLeft in 'eaif' and tipoRight in 'vif':# evaluate expression
                     try:
                         resultado = str( evaluate( valorLeft ) )
+                        resultado = AddCommas( resultado )
                         line = writeResult( line, mEqualSignAct.end(), RightActEnd, resultado )
                     except:
                         print 'eval error:', tipoLeft, valorLeft, tipoRight, valorRight
@@ -343,12 +344,14 @@ def feed( text ):
                         else:                   # evaluate a variable
                             if valorLeft in variables:
                                     resultado = variables[ valorLeft ]
+                                    resultado = AddCommas( resultado )
                                     line = writeResult( line, mEqualSignAct.end(), RightActEnd, resultado )
 
                     else:                                  # function on the left: evaluate
                         if valorLeft not in functions[ valorLeft ]:
                             try:                # standard formula
                                 resultado = str( evaluate( valorLeft ) )
+                                resultado = AddCommas( resultado )
                                 line = writeResult( line, mEqualSignAct.end(), RightActEnd, resultado )
                             except:
                                 print 'eval error:', tipoLeft, valorLeft, tipoRight, valorRight
@@ -358,6 +361,7 @@ def feed( text ):
                                 variables[ valorLeft ] = str( evaluate( str( valorRight ) ) )
                             else:                                         # iteration
                                 resultado = str( evaluate( functions[ valorLeft ] ) )
+                                resultado = AddCommas( resultado )
                                 line = writeResult( line, mEqualSignAct.end(), RightActEnd, resultado )
                                 variables[ valorLeft ] = resultado
 
@@ -381,6 +385,28 @@ def feed( text ):
 
     return '\n'.join( lines )
 
+
+def AddCommas( s ):
+    ''''Return s with thousands separators.
+
+    Handles sign, decimals and thousands
+    separator.
+    '''
+
+    s = s.replace( ',', '')         #remove commas
+    if s[0] in '-+':                #remove sign
+            sign = s[0]
+            s = s[1:]
+    else:
+            sign = ''
+    if s[-1] == 'L': s = s[:-1]     #remove L suffix
+    pos = s.find( '.')
+    if pos < 0: pos = len(s)
+    while pos > 3:
+            pos = pos - 3
+            s = s[:pos] + ',' + s[pos:]
+    s = sign + s                    #restore sign
+    return s
 
 def writeResult( buffer, start, end, text ):
     'Return buffer with text applied from start to end offset.'
