@@ -198,11 +198,11 @@ def TypeAndValueOf( expression ):
         return 'v', ''
     try:
         n = int( expression.replace( ',', '' ) )
-        return 'i', n
+        return 'i', expression
     except:
         try:
             n = float( expression.replace( ',', '' ) )
-            return 'f', n
+            return 'f', expression
         except:
             expresion_python = re.sub( r'\bx\b', '*', expression )
             expresion_python = re.sub( r'%', '/100.', expresion_python )
@@ -271,7 +271,7 @@ def feed( text ):
 
                 # perform operations
 
-                if tipoLeft in 'ea' and tipoRight in 'vif':# evaluate expression
+                if tipoLeft in 'eaif' and tipoRight in 'vif':# evaluate expression
                     try:
                         resultado = str( evaluate( valorLeft ) )
                         line = writeResult( line, mEqualSignAct.end(), RightActEnd, resultado )
