@@ -103,7 +103,7 @@ def evaluate( expression_text ):
         if v in '-+':
             expression.append( v )
             t, v = gettoken( doc )
-        if re.search( '[0-9]+', v ) :
+        if t == 'f':
             expression.append( v )
             t, v = gettoken( doc )
         elif v == '(':
@@ -112,11 +112,11 @@ def evaluate( expression_text ):
             expr()
             expression.append( v )
             t, v = gettoken( doc )
-        elif re.search( '[a-zA-Z]+', v):
-            if variables.has_key( v ):
+        elif t == 'n':
+            if v in variables:
                 expression.append( variables[ v ] )
                 t, v = gettoken( doc )
-            elif functions.has_key( v ):
+            elif v in functions:
                 expression.append( str( evaluate( functions[ v ] ) ) )
                 t, v = gettoken( doc )
             else:
