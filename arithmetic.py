@@ -26,9 +26,9 @@ reidentifier = re.compile( r'[a-zA-Z][a-zA-Z0-9_]*' )
 rexenclosed = re.compile( r'[0-9.](x)[^a-zA-Z]' )
 
 def gettoken( doc ):
-    '''Get next token from text and return it.
+    '''Get next token from text and return its type and value.
     
-    Return None if no more text.
+    Return (None,None) if no more text.
     
     doc has text and offset attributes.
 
@@ -50,37 +50,38 @@ def gettoken( doc ):
         if doc.text[ doc.offset ] == '\n':
             value = doc.text[ doc.offset ]
             doc.offset = doc.offset + 1
-            return value
+            return ( 'r', value )
         m = rexenclosed.match( doc.text, doc.offset - 1 )
         if m:
             value = m.group(1)
             doc.offset = m.end(1)
-            return value
+            return ( 'x', value )
         m = renumber.match( doc.text, doc.offset )
         if m:
             value = m.group()
             doc.offset = m.end()
-            return value
+            return ( 'f', value )
         m = reidentifier.match( doc.text, doc.offset )
         if m:
             value = m.group()
             doc.offset = m.end()
-            return value
+            return ( 'n', value )
         if doc.text[ doc.offset: doc.offset + 2 ] == '**':
             value = doc.text[ doc.offset: doc.offset + 2 ]
             doc.offset = doc.offset + 2
-            return value
+            return ( 'o', value )
         if doc.text[ doc.offset ] in '+-*/^()':
             value = doc.text[ doc.offset ]
             doc.offset = doc.offset + 1
-            return value
+            return ( 'o', value )
         value = doc.text[ doc.offset ] + '***' 
         doc.offset = doc.offset + 1
-        return value
-    return None	
+        return ( 'u', value )
+    return ( None, None )
 
 
 t = ''
+v = ''
 from decimal import Decimal, getcontext
 getcontext().prec = 100
 
@@ -89,7 +90,7 @@ def evaluate( expression_text ):
 
     '''
     global text
-    global t
+    global t, v
     tokens = []
     expression = []
 
@@ -98,35 +99,35 @@ def evaluate( expression_text ):
         offset = 0
 
     def factor():
-        global t
-        if t in '-+':
-            expression.append( t )
-            t = gettoken( doc )
-        if re.search( '[0-9]+', t ) :
-            expression.append( t )
-            t = gettoken( doc )
-        elif t == '(':
-            expression.append( t )
-            t = gettoken( doc )
+        global t, v
+        if v in '-+':
+            expression.append( v )
+            t, v = gettoken( doc )
+        if re.search( '[0-9]+', v ) :
+            expression.append( v )
+            t, v = gettoken( doc )
+        elif v == '(':
+            expression.append( v )
+            t, v = gettoken( doc )
             expr()
-            expression.append( t )
-            t = gettoken( doc )
-        elif re.search( '[a-zA-Z]+', t):
-            if variables.has_key( t ):
-                expression.append( variables[ t ] )
-                t = gettoken( doc )
-            elif functions.has_key( t ):
-                expression.append( str( evaluate( functions[ t ] ) ) )
-                t = gettoken( doc )
+            expression.append( v )
+            t, v = gettoken( doc )
+        elif re.search( '[a-zA-Z]+', v):
+            if variables.has_key( v ):
+                expression.append( variables[ v ] )
+                t, v = gettoken( doc )
+            elif functions.has_key( v ):
+                expression.append( str( evaluate( functions[ v ] ) ) )
+                t, v = gettoken( doc )
             else:
-                expression.append( t + ' undefined' )
-                t = gettoken( doc )
+                expression.append( v + ' undefined' )
+                t, v = gettoken( doc )
 
     def factors():
-        global t
-        if t == '^' or t == '**':
+        global t, v
+        if v == '^' or v == '**':
             expression.append( '**' )
-            t = gettoken( doc )
+            t, v = gettoken( doc )
             power()
 
     def power():
@@ -134,10 +135,10 @@ def evaluate( expression_text ):
         factors()
 
     def powers():
-        global t
-        if t and t in '*x/':
-            expression.append( t.replace( 'x', '*') )
-            t = gettoken( doc )
+        global t, v
+        if v and v in '*x/':
+            expression.append( v.replace( 'x', '*') )
+            t, v = gettoken( doc )
             power()
             powers()
 
@@ -146,10 +147,10 @@ def evaluate( expression_text ):
         powers()
 
     def terms():
-        global t
-        if t and t in '-+':
-            expression.append( t )
-            t = gettoken( doc )
+        global t, v
+        if v and v in '-+':
+            expression.append( v )
+            t, v = gettoken( doc )
             term()
             terms()
 
@@ -157,7 +158,7 @@ def evaluate( expression_text ):
         term()
         terms()
 
-    t = gettoken( doc )
+    t, v = gettoken( doc )
     expr()
 
     expressionD = []
