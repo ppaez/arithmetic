@@ -104,7 +104,7 @@ def evaluate( expression_text ):
             expression.append( v )
             t, v = gettoken( doc )
         if t == 'f':
-            expression.append( v )
+            expression.append( v.replace( ',', '' ) )
             t, v = gettoken( doc )
         elif v == '(':
             expression.append( v )
