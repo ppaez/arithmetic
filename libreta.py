@@ -72,8 +72,8 @@ if len(sys.argv) > 1:
     except:
         pass  # new file
 else:
-    filename = 'unnammed'
-root.title( filename + ' - Libreta 0.1' )
+    filename = 'unnamed'
+root.title( filename + ' - Libreta 0.2' )
 
 
 root.mainloop()
