@@ -119,15 +119,18 @@ def evaluate( expression_text ):
             expression.append( v )
             t, v = gettoken( doc )
         elif t == 'n':
-            if v in variables:
-                expression.append( variables[ v ] )
+            name = v
+            t, v = gettoken( doc )
+            # handle multiple word names
+            while t == 'n' and v != 'x':
+                name = name + ' ' + v
                 t, v = gettoken( doc )
-            elif v in functions:
-                expression.append( str( evaluate( functions[ v ] ) ) )
-                t, v = gettoken( doc )
+            if name in variables:
+                expression.append( variables[ name ] )
+            elif name in functions:
+                expression.append( str( evaluate( functions[ name ] ) ) )
             else:
-                expression.append( v + ' undefined' )
-                t, v = gettoken( doc )
+                expression.append( name + ' undefined' )
 
     def factors():
         global t, v
