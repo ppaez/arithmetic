@@ -104,7 +104,13 @@ def evaluate( expression_text ):
             expression.append( v )
             t, v = gettoken( doc )
         if t == 'f':
-            expression.append( v.replace( ',', '' ) )
+            #  remove comas
+            #  translate % to /100'''
+            value = v.replace( '%', '' )
+            expression.append( value.replace( ',', '' ) )
+            if v[-1] == '%':
+                expression.append( '/' )
+                expression.append( '100' )
             t, v = gettoken( doc )
         elif v == '(':
             expression.append( v )
@@ -191,8 +197,7 @@ def TypeAndValueOf( expression ):
     n = name
     
     value is expression with some modifications:
-    blank spaces and commas removed, x replaced by *,
-    % replaced by /100.'''
+    blank spaces and commas removed, x replaced by *.'''
 
     if not expression.strip():  # empty
         return 'v', ''
@@ -205,7 +210,6 @@ def TypeAndValueOf( expression ):
             return 'f', expression
         except:
             expresion_python = re.sub( r'\bx\b', '*', expression )
-            expresion_python = re.sub( r'%', '/100.', expresion_python )
             for op in '+-*/':
                 if op in expresion_python:
                     expresion_python = expresion_python.replace( ' ', '' )
