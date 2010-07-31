@@ -21,7 +21,7 @@ variables = {}
 functions = {}
 
 
-renumber = re.compile( r'([0-9][0-9, ]*(\.[0-9]*)?%?)|(\.[0-9]+%?)' )
+renumber = re.compile( r'([0-9][0-9,]*(\.[0-9]*)?%?)|(\.[0-9]+%?)' )
 reidentifier = re.compile( r'[a-zA-Z][a-zA-Z0-9_]*' )
 rexenclosed = re.compile( r'[0-9.](x)[^a-zA-Z]' )
 
@@ -249,9 +249,16 @@ def feed( text ):
             # the larger of mEqualSignPrev, mSeparLeft, mColonLeft, beginofline
             LeftStarts = []
             LeftStarts.append( mEqualSignPrev.end() )
+
             mSeparLeft = reSepar.search( line, mEqualSignPrev.end(), mEqualSignAct.start() )
             if mSeparLeft:
-                LeftStarts.append( mSeparLeft.end() )
+                SeparLeftEnd = mSeparLeft.end()
+                mSeparLeft = reSepar.search( line, mSeparLeft.end(), mEqualSignAct.start() )
+                while mSeparLeft:     # search next
+                    SeparLeftEnd = mSeparLeft.end()
+                    mSeparLeft = reSepar.search( line, mSeparLeft.end(), mEqualSignAct.start() )
+                LeftStarts.append( SeparLeftEnd )
+
             mColonLeft = reColonLeft.search( line, mEqualSignPrev.end(), mEqualSignAct.start() )
             if mColonLeft:
                 LeftStarts.append( mColonLeft.end() )
