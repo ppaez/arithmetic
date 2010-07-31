@@ -51,16 +51,16 @@ def gettoken( doc ):
             value = doc.text[ doc.offset ]
             doc.offset = doc.offset + 1
             return ( 'r', value )
-        m = rexenclosed.match( doc.text, doc.offset - 1 )
-        if m:
-            value = m.group(1)
-            doc.offset = m.end(1)
-            return ( 'x', value )
         m = renumber.match( doc.text, doc.offset )
         if m:
             value = m.group()
             doc.offset = m.end()
             return ( 'f', value )
+        m = rexenclosed.match( doc.text, doc.offset - 1 )
+        if m:
+            value = m.group(1)
+            doc.offset = m.end(1)
+            return ( 'x', value )
         m = reidentifier.match( doc.text, doc.offset )
         if m:
             value = m.group()
@@ -77,7 +77,7 @@ def gettoken( doc ):
         value = doc.text[ doc.offset ] + '***' 
         doc.offset = doc.offset + 1
         return ( 'u', value )
-    return ( None, None )
+    return ( '', None )
 
 
 t = ''
@@ -199,24 +199,29 @@ def TypeAndValueOf( expression ):
     value is expression with some modifications:
     blank spaces and commas removed, x replaced by *.'''
 
-    if not expression.strip():  # empty
+    class doc:
+        text = expression
+        offset = 0
+
+    # Capture the odd token types
+    doc.text = re.sub( '[()]', '', doc.text )
+    t, v = gettoken( doc )
+    oddtokens = t
+    while t:
+        t, v = gettoken( doc )
+        t, v = gettoken( doc )
+        oddtokens = oddtokens + t
+
+    if oddtokens == '':  # empty
         return 'v', ''
-    try:
-        n = int( expression.replace( ',', '' ) )
-        return 'i', expression
-    except:
-        try:
-            n = float( expression.replace( ',', '' ) )
-            return 'f', expression
-        except:
-            expresion_python = re.sub( r'\bx\b', '*', expression )
-            for op in '+-*/':
-                if op in expresion_python:
-                    expresion_python = expresion_python.replace( ' ', '' )
-                    if re.search( '([a-zA-Z][a-zA-Z0-9]*)', expresion_python ):
-                        return 'e', expresion_python  # expression with names
-                    return 'a', expresion_python
-            return 'n', expression.replace( ' ', '' )
+    elif oddtokens == 'f':
+        return 'f', expression
+    elif oddtokens == 'n':
+        return 'n', expression
+    elif 'n' in oddtokens or 'x' in oddtokens:
+        return 'e', expression  # expression with names
+    else:
+        return 'a', expression
 
 def feed( text ):
     'Feed text to the parser.  It is processed line by line.'
