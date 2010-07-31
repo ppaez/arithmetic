@@ -129,7 +129,12 @@ def evaluate( expression_text ):
             if name in variables:
                 expression.append( variables[ name ] )
             elif name in functions:
-                expression.append( str( evaluate( functions[ name ] ) ) )
+                if name not in functions[ name ]:
+                    # standard formula
+                    expression.append( str( evaluate( functions[ name ] ) ) )
+                else:
+                    # recurrent relation wihout initial value
+                    expression.append( '0' )
             else:
                 expression.append( name + ' undefined' )
 

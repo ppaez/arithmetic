@@ -5,6 +5,9 @@ Supongamos: base = 5 x 3 =   para empezar.
   altura= 2   radio=     algo en medio      lado = 5        lado =
 base x altura =
 
+Recurrence:    n = n + 1     n =     n = 1    n =    n =   n =
+               f = f x n     f =     f = 1    f =    f =   f =
+
 perimetro = (base + altura) x 2 =
  perimetro =
 altura = 3    perimetro = 36
