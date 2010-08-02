@@ -6,7 +6,7 @@ Supongamos: base = 5 x 3 =   para empezar.
 base x altura =
 
 Recurrence:    n = n + 1     n =     n = 1    n =    n =   n =
-               f = f x n     f =     f = 1    f =    f =   f =
+               g = g x n     g =     g = 1    g =    g =   g =
 
 perimetro = (base + altura) x 2 =
  perimetro =
