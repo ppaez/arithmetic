@@ -1,0 +1,59 @@
+Introduction
+------------
+
+arithmetic is a Python module that allows mixing arithmetic
+operations and text.  It resembles the calculator program bc.
+
+A sample Tk-based editor that uses the module is provided as
+a starting point.
+
+Tutorial documents are included, they will quickly show
+all the features of arithmetic.
+
+
+Using the tutorials
+-------------------
+
+Open files tutorial-1 and tutorial-2 with Libreta,
+the editor application included with the module.
+
+There is no need to install the module, Libreta runs
+as is from the source directory:
+
+-  In GNU/Linux:  open a terminal, cd to the source 
+   directory and type the following commands:
+
+   ./libreta.py tutorial-1
+   ./libreta.py tutorial-2
+
+-  In Windows: explore the source directory and drag
+   the tutorial file over the libreta.py icon.
+
+Tkinter is required. you might need to install package
+python-tk in GNU/Linux. Tkinter is automatically installed
+in Windows.
+
+
+Downloading
+-----------
+
+The module and its documentation can be found at
+http://pp.com.mx/python/arithmetic
+
+
+Installing
+----------
+
+To use the module or Libreta from any directory in your
+PC, cd to the source directory and type as root:
+
+   python setup.py install
+
+
+Contributing
+------------
+
+Please provide suggestions, comments and patches
+to the following address:
+
+Patricio Paez <pp@pp.com.mx>

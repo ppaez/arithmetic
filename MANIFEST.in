@@ -1,0 +1,4 @@
+include COPYING
+include CHANGELOG
+include tutorial-1
+include tutorial-2
