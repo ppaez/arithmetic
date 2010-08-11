@@ -12,6 +12,7 @@ perimetro = (base + altura) x 2 =
  perimetro =
 altura = 3    perimetro = 36    altura = 4    perimetro =
 5x75=         (1+3)x(4+1)=      (1+3) x (4+1) =    x100 = 81  x100 =   9 x x100 =   9x100 =
+2^6 =     2**8 =      (2^10)^2 =     2**10**2 =
 
 c = (f - 32) x 5 / 9
 f = 212     c =567
@@ -26,8 +27,6 @@ dato = 3    cuadrado =
 dato = 9    cuadrado =
 dato = 81   cuadrado =
 dato = 729  cuadrado =400
-
-   Calculo de pension de cesantia:
 
 semanas cotizadas = sc = 1,350
 cuantia basica = salario promedio x 13%

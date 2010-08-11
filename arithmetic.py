@@ -178,7 +178,7 @@ def evaluate( expression_text ):
 
     expressionD = []
     for element in expression:
-        if element not in '+-x/^*()' or element == '**':
+        if element not in '+-x/^*()' and element != '**':
             element = "Decimal('" + element + "')"
         expressionD.append( element )
 
