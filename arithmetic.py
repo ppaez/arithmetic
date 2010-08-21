@@ -361,5 +361,43 @@ def writeResult( buffer, start, end, text ):
 
 if __name__ == '__main__':
     import sys
-    text = open( sys.argv[1] ).read()
-    print feed( text )
+    if len( sys.argv ) >= 2:
+        if sys.argv[1] in [ '-h', '--help' ]:
+            print 'arithmetic is a Python module that allows mixing arithmetic'
+            print 'operations and text.'
+            print
+            print 'Usage:'
+            print
+            print '      arithmetic expression(s) Evaluate expression(s).'
+            print '      arithmetic -f path       Read path contents and evaluate.'
+            print '      arithmetic -h            Show usage'
+            print '      arithmetic               Read from standard input'
+            print
+            print 'Examples:'
+            print
+            print '      $ arithmetic 2 x 3'
+            print '      6'
+            print '      $ echo 4 x 12 | arithmetic'
+            print '      48'
+            print '      $ echo a = 5    a + 4 = | arithmetic'
+            print '      a = 5    a + 4 = 9'
+            print '      arithmetic -h            Show usage'
+            print '      arithmetic               Read from standard input'
+            print
+        elif sys.argv[1] == '-f':
+            filename = sys.argv[2]
+            text = open( filename ).read()
+            print feed( text )
+        else:
+            text =  ' '.join( sys.argv[ 1: ] )
+            if '=' in text:
+                print feed( text )
+            else:
+                print evaluate( text )
+    else:
+        text = sys.stdin.read()
+        lines = text.splitlines()
+        if len(lines) == 1:
+            print evaluate( lines[0] )
+        else:
+            print feed( text )
