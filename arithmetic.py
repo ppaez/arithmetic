@@ -14,6 +14,37 @@
 #   You should have received a copy of the GNU General Public License
 #   along with this program.  If not, see <http://www.gnu.org/licenses/>
 
+
+__doc__ = '''
+arithmetic is a Python module that allows mixing arithmetic
+operations and text.
+
+Usage as command:
+
+      arithmetic expression(s) Evaluate expression(s).
+      arithmetic -f path       Read path contents and evaluate.
+      arithmetic               Read from standard input and evaluate.
+      arithmetic -h            Show usage
+
+Examples:
+
+      $ arithmetic 2 x 3
+      6
+      $ echo 4 x 12 | arithmetic
+      48
+      $ echo a = 5    a + 4 = | arithmetic
+      a = 5    a + 4 = 9
+      $ arithmetic < filename
+      ...
+
+Usage as module:
+
+     from arithmetic import feed
+     ...
+     resultText = feed( inputText )
+     ...
+'''
+
 import re
 
 # Written by the equation processor, read by evaluate():
@@ -190,8 +221,6 @@ reEqualSign = re.compile( ' ?= ?' )
 reSepar = re.compile( '  +' )
 reColonLeft = re.compile( ': ' )
 
-globales = { '__builtins__' : '' }
-funciones = []
 
 
 def TypeAndValueOf( expression ):
@@ -363,27 +392,7 @@ if __name__ == '__main__':
     import sys
     if len( sys.argv ) >= 2:
         if sys.argv[1] in [ '-h', '--help' ]:
-            print 'arithmetic is a Python module that allows mixing arithmetic'
-            print 'operations and text.'
-            print
-            print 'Usage:'
-            print
-            print '      arithmetic expression(s) Evaluate expression(s).'
-            print '      arithmetic -f path       Read path contents and evaluate.'
-            print '      arithmetic -h            Show usage'
-            print '      arithmetic               Read from standard input'
-            print
-            print 'Examples:'
-            print
-            print '      $ arithmetic 2 x 3'
-            print '      6'
-            print '      $ echo 4 x 12 | arithmetic'
-            print '      48'
-            print '      $ echo a = 5    a + 4 = | arithmetic'
-            print '      a = 5    a + 4 = 9'
-            print '      arithmetic -h            Show usage'
-            print '      arithmetic               Read from standard input'
-            print
+            print __doc__
         elif sys.argv[1] == '-f':
             filename = sys.argv[2]
             text = open( filename ).read()
