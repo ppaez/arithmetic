@@ -135,7 +135,7 @@ def evaluate( expression_text ):
             expression.append( v )
             t, v = gettoken( doc )
         if t == 'f':
-            #  remove comas and spaces
+            #  remove commas and spaces
             #  translate % to /100'''
             value = v.replace( '%', '' )
             value = value.replace( ' ', '' )
@@ -158,7 +158,9 @@ def evaluate( expression_text ):
                 name = name + ' ' + v
                 t, v = gettoken( doc )
             if name in variables:
-                expression.append( variables[ name ] )
+                # remove commas
+                value = variables[ name ].replace( ',', '' )
+                expression.append( value )
             elif name in functions:
                 if name not in functions[ name ]:
                     # standard formula
