@@ -335,7 +335,6 @@ def feed( text ):
                 if tipoLeft in 'eaif' and tipoRight in 'vif':# evaluate expression
                     try:
                         resultado = str( evaluate( valorLeft ) )
-                        resultado = AddCommas( resultado )
                         line = writeResult( line, mEqualSignAct.end(), RightActEnd, resultado )
                     except:
                         print 'eval error:', tipoLeft, valorLeft, tipoRight, valorRight
@@ -358,7 +357,6 @@ def feed( text ):
                         if valorLeft not in functions[ valorLeft ]:
                             try:                # standard formula
                                 resultado = str( evaluate( valorLeft ) )
-                                resultado = AddCommas( resultado )
                                 line = writeResult( line, mEqualSignAct.end(), RightActEnd, resultado )
                             except:
                                 print 'eval error:', tipoLeft, valorLeft, tipoRight, valorRight
@@ -368,7 +366,6 @@ def feed( text ):
                                 variables[ valorLeft ] = str( evaluate( str( valorRight ) ) )
                             else:                                         # iteration
                                 resultado = str( evaluate( functions[ valorLeft ] ) )
-                                resultado = AddCommas( resultado )
                                 line = writeResult( line, mEqualSignAct.end(), RightActEnd, resultado )
                                 variables[ valorLeft ] = resultado
 
