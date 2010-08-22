@@ -7,7 +7,7 @@ except ImportError:
 
 import sys,os,string,time
 
-version = '0.2'
+version = '0.3'
 
 kwargs = dict()
 if has_setuptools:
@@ -26,5 +26,5 @@ setup(
 	url = 'http://pp.com.mx/python/arithmetic/',
 	py_modules = [ 'arithmetic' ],
         data_files = [ ( '', [ 'COPYING', 'CHANGELOG' ] ) ],
-        scripts = [ 'libreta.py' ],
+        scripts = [ 'libreta.py', 'arithmetic' ],
 )

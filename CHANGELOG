@@ -1,3 +1,9 @@
+0.3   22 August 2010
+      Fix ^ and **
+      Allow standalone use
+      Added -h and --help
+      Use digit grouping in results
+
 0.2   1 August 2010
       Simplify and fix bugs
 
