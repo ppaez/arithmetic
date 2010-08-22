@@ -116,8 +116,10 @@ v = ''
 from decimal import Decimal, getcontext
 getcontext().prec = 100
 
-def evaluate( expression_text ):
+def evaluate( expression_text, UseDigitGrouping = True ):
     '''Parse expression, calculate and return its result.
+
+    if UseDigitGrouping is True, the result includes commas.
 
     '''
     global text
@@ -164,7 +166,7 @@ def evaluate( expression_text ):
             elif name in functions:
                 if name not in functions[ name ]:
                     # standard formula
-                    expression.append( str( evaluate( functions[ name ] ) ) )
+                    expression.append( str( evaluate( functions[ name ], UseDigitGrouping = False ) ) )
                 else:
                     # recurrent relation wihout initial value
                     expression.append( '0' )
@@ -215,7 +217,10 @@ def evaluate( expression_text ):
             element = "Decimal('" + element + "')"
         expressionD.append( element )
 
-    return eval( ''.join( expressionD ) )
+    if UseDigitGrouping:
+        return AddCommas( eval( ''.join( expressionD ) ) )
+    else:
+        return eval( ''.join( expressionD ) )
 
 
 
@@ -395,6 +400,7 @@ def AddCommas( s ):
     separator.
     '''
 
+    s = str( s )
     s = s.replace( ',', '')         #remove commas
     if s[0] in '-+':                #remove sign
             sign = s[0]
