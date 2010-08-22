@@ -1,1 +1,1 @@
-python arithmetic.py "$@"
+python -m arithmetic "$@"
