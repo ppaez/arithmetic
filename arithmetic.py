@@ -32,7 +32,7 @@ Examples:
       6
       $ echo 4 x 12 | arithmetic
       48
-      $ echo a = 5    a + 4 = | arithmetic
+      $ echo 'a = 5    a + 4 =' | arithmetic
       a = 5    a + 4 = 9
       $ arithmetic < filename
       ...
@@ -406,7 +406,7 @@ if __name__ == '__main__':
     else:
         text = sys.stdin.read()
         lines = text.splitlines()
-        if len(lines) == 1:
-            print evaluate( lines[0] )
-        else:
+        if '=' in text or len(lines) > 1:
             print feed( text )
+        else:
+            print evaluate( lines[0] )
