@@ -1,0 +1,28 @@
+Starting
+--------
+
+You may do standard arithmetic operations in a document,
+ending the operation with an equals sign, for example:
+
+     5 x 3 + 1 =
+
+Single spaces may be used between the quantities and the
+operators for clarity.  Two or more spaces, or a colon
+delimit an operation, like here: 100 + 1 =
+
+You may use 'x' as the multiplication symbol in most
+cases, or '*' if you want.
+
+Operations can be...   (2+7)x5 =   anywhere!
+
+Press <F5> now to obtain the results of all calculations
+in the document.  If you go up and modify some number,
+press <F5> to recalculate.
+
+Commands
+--------
+
+control-s saves the document.
+control-l reload the document, loosing changes.
+control-q ends Libreta.
+<F5> recalculates.

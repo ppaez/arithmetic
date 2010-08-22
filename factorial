@@ -1,0 +1,38 @@
+
+You can define recurrence relations:
+
+g = g + 1      the initial value:  g = 1
+
+The result for g changes every time you obtain it. 
+
+Add a formula that depends in g, actually another
+recurrence relation and its initial value: 
+
+factorial = factorial x g     factorial = 1
+
+g =         factorial = 
+g =         factorial = 
+g =         factorial = 
+g =         factorial = 
+g =         factorial = 
+g =         factorial = 
+g =         factorial = 
+g =         factorial = 
+g =         factorial = 
+g =         factorial = 
+g =         factorial = 
+g =         factorial = 
+g =         factorial = 
+g =         factorial = 
+g =         factorial = 
+g =         factorial = 
+g =         factorial = 
+g =         factorial = 
+g =         factorial = 
+g =         factorial = 
+g =         factorial = 
+g =         factorial = 
+g =         factorial = 
+g =         factorial = 
+
+
