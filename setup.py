@@ -25,6 +25,7 @@ setup(
 	author_email = 'pp@pp.com.mx',
 	url = 'http://pp.com.mx/python/arithmetic/',
 	py_modules = [ 'arithmetic' ],
-        data_files = [ ( '', [ 'COPYING', 'CHANGELOG' ] ) ],
+        data_files = [ ( 'share/arithmetic-' + version, [ 'COPYING',
+            'CHANGELOG', 'README', 'tutorial-1', 'tutorial-2' ] ) ],
         scripts = [ 'libreta.py', 'arithmetic' ],
 )
