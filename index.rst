@@ -16,6 +16,8 @@ It is licensed under the Gnu GPL license version 2 or later.
 =================================   ===========
 Version                                 Date   
 =================================   ===========
+`0.4 <arithmetic-0.4.tar.gz>`_      30-Dec-2010
+---------------------------------   -----------
 `0.3 <arithmetic-0.3.tar.gz>`_      22-Aug-2010
 ---------------------------------   -----------
 `0.2 <arithmetic-0.2.tar.gz>`_      01-Aug-2010
