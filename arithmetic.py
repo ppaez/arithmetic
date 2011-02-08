@@ -268,21 +268,9 @@ def TypeAndValueOf( expression ):
     else:
         return 'a', expression
 
-def feed( text ):
-    'Feed text to the parser.  It is processed line by line.'
+def parseLine( i, lines):
+        'Find and evaluate expresions in line i.'
 
-    global functions, variables
-    # Initialize
-    functions = {}
-    variables = {}
-
-    lines = text.splitlines()
-
-    for i in range( len(lines) ):
-
-        # parseLine( i, lines )
-        #
-        # def parseLine( i, lines):
         line = lines[i]
         RightPrevStart = 0
         RightPrevEnd = 0
@@ -390,7 +378,19 @@ def feed( text ):
             mEqualSignAct  = mEqualSignNext
 
         lines[i] = line
-        # end parseLine()
+
+def feed( text ):
+    'Feed text to the parser.  It is processed line by line.'
+
+    global functions, variables
+    # Initialize
+    functions = {}
+    variables = {}
+
+    lines = text.splitlines()
+
+    for i in range( len(lines) ):
+        parseLine( i, lines )
 
     return '\n'.join( lines )
 
