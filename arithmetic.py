@@ -276,10 +276,14 @@ def feed( text ):
     functions = {}
     variables = {}
 
-    lines = []
+    lines = text.splitlines()
 
-    for linenumber, line in enumerate( text.splitlines() ):
+    for i in range( len(lines) ):
 
+        # parseLine( i, lines )
+        #
+        # def parseLine( i, lines):
+        line = lines[i]
         RightPrevStart = 0
         RightPrevEnd = 0
         mEqualSignPrev = re.search( '^', line )
@@ -385,7 +389,8 @@ def feed( text ):
             mEqualSignPrev = mEqualSignAct
             mEqualSignAct  = mEqualSignNext
 
-        lines.append( line )
+        lines[i] = line
+        # end parseLine()
 
     return '\n'.join( lines )
 
