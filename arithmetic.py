@@ -271,7 +271,9 @@ def TypeAndValueOf( expression ):
 def parseLine( i, lines):
         'Find and evaluate expresions in line i.'
 
+        # get line
         line = lines[i]
+
         RightPrevStart = 0
         RightPrevEnd = 0
         mEqualSignPrev = re.search( '^', line )
@@ -327,7 +329,7 @@ def parseLine( i, lines):
                 if tipoLeft in 'eaif' and tipoRight in 'vif':# evaluate expression
                     try:
                         resultado = str( evaluate( valorLeft ) )
-                        line = writeResult( line, mEqualSignAct.end(), RightActEnd, resultado )
+                        writeResult( i, lines, mEqualSignAct.end(), RightActEnd, resultado )
                     except:
                         print 'eval error:', tipoLeft, valorLeft, tipoRight, valorRight
                 elif tipoLeft == 'n' and tipoRight in 'ifav':
@@ -343,13 +345,13 @@ def parseLine( i, lines):
                             if valorLeft in variables:
                                     resultado = variables[ valorLeft ]
                                     resultado = AddCommas( resultado )
-                                    line = writeResult( line, mEqualSignAct.end(), RightActEnd, resultado )
+                                    writeResult( i, lines, mEqualSignAct.end(), RightActEnd, resultado )
 
                     else:                                  # function on the left: evaluate
                         if valorLeft not in functions[ valorLeft ]:
                             try:                # standard formula
                                 resultado = str( evaluate( valorLeft ) )
-                                line = writeResult( line, mEqualSignAct.end(), RightActEnd, resultado )
+                                writeResult( i, lines, mEqualSignAct.end(), RightActEnd, resultado )
                             except:
                                 print 'eval error:', tipoLeft, valorLeft, tipoRight, valorRight
                         else:                   # recurrence relation
@@ -358,7 +360,7 @@ def parseLine( i, lines):
                                 variables[ valorLeft ] = str( evaluate( str( valorRight ) ) )
                             else:                                         # iteration
                                 resultado = str( evaluate( functions[ valorLeft ] ) )
-                                line = writeResult( line, mEqualSignAct.end(), RightActEnd, resultado )
+                                writeResult( i, lines, mEqualSignAct.end(), RightActEnd, resultado )
                                 variables[ valorLeft ] = resultado
 
                 elif tipoLeft == 'n' and tipoRight in 'e': # define a function
@@ -372,12 +374,14 @@ def parseLine( i, lines):
                 RightPrevStart = mEqualSignAct.end()
                 RightPrevEnd = RightActEnd
 
+            # get line
+            line = lines[i]
+
             if mEqualSignNext:
                 mEqualSignNext = reEqualSign.search( line, mEqualSignAct.end() )
             mEqualSignPrev = mEqualSignAct
             mEqualSignAct  = mEqualSignNext
 
-        lines[i] = line
 
 def feed( text ):
     'Feed text to the parser.  It is processed line by line.'
@@ -418,10 +422,10 @@ def AddCommas( s ):
     s = sign + s                    #restore sign
     return s
 
-def writeResult( buffer, start, end, text ):
-    'Return buffer with text applied from start to end offset.'
+def writeResult( i, lines, start, end, text ):
+    'Write text in line i of lines from start to end offset.'
 
-    return buffer[ :start ] + text + buffer[ end: ]
+    lines[i] = lines[i][ :start ] + text + lines[i][ end: ]
 
 
 if __name__ == '__main__':
