@@ -272,7 +272,7 @@ def parseLine( i, lines):
         'Find and evaluate expresions in line i.'
 
         # get line
-        line = lines[i]
+        line = readLine( i, lines )
 
         RightPrevStart = 0
         RightPrevEnd = 0
@@ -375,7 +375,7 @@ def parseLine( i, lines):
                 RightPrevEnd = RightActEnd
 
             # get line
-            line = lines[i]
+            line = readLine( i, lines )
 
             if mEqualSignNext:
                 mEqualSignNext = reEqualSign.search( line, mEqualSignAct.end() )
@@ -393,7 +393,7 @@ def feed( text ):
 
     lines = text.splitlines()
 
-    for i in range( len(lines) ):
+    for i in range( countLines( lines ) ):
         parseLine( i, lines )
 
     return '\n'.join( lines )
@@ -421,6 +421,14 @@ def AddCommas( s ):
             s = s[:pos] + ',' + s[pos:]
     s = sign + s                    #restore sign
     return s
+
+def countLines( lines ):
+    'Return number of lines.'
+    return len( lines )
+
+def readLine( i, lines ):
+    'Return i line from lines.'
+    return lines[i]
 
 def writeResult( i, lines, start, end, text ):
     'Write text in line i of lines from start to end offset.'
