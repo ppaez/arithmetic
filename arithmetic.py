@@ -47,10 +47,6 @@ Usage as module:
 
 import re
 
-# Written by the equation processor, read by evaluate():
-variables = {}
-functions = {}
-
 
 renumber = re.compile( r'([0-9][0-9,]*(\.[0-9]*)?%?)|(\.[0-9]+%?)' )
 reidentifier = re.compile( r'[a-zA-Z][a-zA-Z0-9_]*' )
@@ -116,7 +112,7 @@ v = ''
 from decimal import Decimal, getcontext
 getcontext().prec = 100
 
-def evaluate( expression_text, UseDigitGrouping = True ):
+def evaluate( expression_text, UseDigitGrouping = True, variables = {}, functions = {} ):
     '''Parse expression, calculate and return its result.
 
     if UseDigitGrouping is True, the result includes commas.
@@ -166,7 +162,9 @@ def evaluate( expression_text, UseDigitGrouping = True ):
             elif name in functions:
                 if name not in functions[ name ]:
                     # standard formula
-                    expression.append( str( evaluate( functions[ name ], UseDigitGrouping = False ) ) )
+                    expression.append( str( evaluate( functions[ name ],
+                                       UseDigitGrouping = False,
+                                       variables=variables, functions=functions ) ) )
                 else:
                     # recurrent relation wihout initial value
                     expression.append( '0' )
@@ -268,7 +266,7 @@ def TypeAndValueOf( expression ):
     else:
         return 'a', expression
 
-def parseLine( i, lines):
+def parseLine( i, lines, variables={}, functions={} ):
         'Find and evaluate expresions in line i.'
 
         # get line
@@ -328,7 +326,8 @@ def parseLine( i, lines):
 
                 if tipoLeft in 'eaif' and tipoRight in 'vif':# evaluate expression
                     try:
-                        resultado = str( evaluate( valorLeft ) )
+                        resultado = str( evaluate( valorLeft,
+                                    variables=variables, functions=functions ) )
                         writeResult( i, lines, mEqualSignAct.end(), RightActEnd, resultado )
                     except:
                         print 'eval error:', tipoLeft, valorLeft, tipoRight, valorRight
@@ -336,7 +335,8 @@ def parseLine( i, lines):
                     if valorLeft not in functions:     # variable on the left
                         if tipoRight != 'v':    # assign to variable
                             try:
-                                variables[ valorLeft ] = str( evaluate( str( valorRight) ) )
+                                variables[ valorLeft ] = str( evaluate( str( valorRight),
+                                                         variables=variables, functions=functions ) )
 
                             except:
                                 print 'exec error:', tipoLeft, valorLeft, tipoRight, valorRight
@@ -350,16 +350,19 @@ def parseLine( i, lines):
                     else:                                  # function on the left: evaluate
                         if valorLeft not in functions[ valorLeft ]:
                             try:                # standard formula
-                                resultado = str( evaluate( valorLeft ) )
+                                resultado = str( evaluate( valorLeft,
+                                            variables=variables, functions=functions ) )
                                 writeResult( i, lines, mEqualSignAct.end(), RightActEnd, resultado )
                             except:
                                 print 'eval error:', tipoLeft, valorLeft, tipoRight, valorRight
                         else:                   # recurrence relation
                             if valorLeft not in variables:            # initial value
                               if valorRight != '':
-                                variables[ valorLeft ] = str( evaluate( str( valorRight ) ) )
+                                variables[ valorLeft ] = str( evaluate( str( valorRight ),
+                                                         variables=variables, functions=functions ) )
                             else:                                         # iteration
-                                resultado = str( evaluate( functions[ valorLeft ] ) )
+                                resultado = str( evaluate( functions[ valorLeft ],
+                                                 variables=variables, functions=functions ) )
                                 writeResult( i, lines, mEqualSignAct.end(), RightActEnd, resultado )
                                 variables[ valorLeft ] = resultado
 
@@ -386,15 +389,15 @@ def parseLine( i, lines):
 def feed( text ):
     'Feed text to the parser.  It is processed line by line.'
 
-    global functions, variables
     # Initialize
+    # Written by parseLine(), read by evaluate():
     functions = {}
     variables = {}
 
     lines = text.splitlines()
 
     for i in range( countLines( lines ) ):
-        parseLine( i, lines )
+        parseLine( i, lines, variables=variables, functions=functions )
 
     return '\n'.join( lines )
 
