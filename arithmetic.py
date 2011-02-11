@@ -274,6 +274,16 @@ class Parser:
         self.functions = {}
         self.variables = {}
 
+    def parse( self, text ):
+        'Find expresions in text, return it with results.'
+
+        lines = text.splitlines()
+
+        for i in range( self.countLines( lines ) ):
+            self.parseLine( i, lines, variables=self.variables, functions=self.functions )
+
+        return '\n'.join( lines )
+
     def countLines( self, lines ):
         'Return number of lines.'
         return len( lines )
@@ -413,12 +423,8 @@ def feed( text ):
     # Create instance of parser
     parser = Parser()
 
-    lines = text.splitlines()
-
-    for i in range( parser.countLines( lines ) ):
-        parser.parseLine( i, lines, variables=parser.variables, functions=parser.functions )
-
-    return '\n'.join( lines )
+    # Parse the text
+    return parser.parse( text )
 
 
 def AddCommas( s ):
