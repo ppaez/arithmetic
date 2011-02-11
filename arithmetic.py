@@ -266,6 +266,19 @@ def TypeAndValueOf( expression ):
     else:
         return 'a', expression
 
+def countLines( lines ):
+    'Return number of lines.'
+    return len( lines )
+
+def readLine( i, lines ):
+    'Return i line from lines.'
+    return lines[i]
+
+def writeResult( i, lines, start, end, text ):
+    'Write text in line i of lines from start to end offset.'
+
+    lines[i] = lines[i][ :start ] + text + lines[i][ end: ]
+
 def parseLine( i, lines, variables={}, functions={} ):
         'Find and evaluate expresions in line i.'
 
@@ -424,20 +437,6 @@ def AddCommas( s ):
             s = s[:pos] + ',' + s[pos:]
     s = sign + s                    #restore sign
     return s
-
-def countLines( lines ):
-    'Return number of lines.'
-    return len( lines )
-
-def readLine( i, lines ):
-    'Return i line from lines.'
-    return lines[i]
-
-def writeResult( i, lines, start, end, text ):
-    'Write text in line i of lines from start to end offset.'
-
-    lines[i] = lines[i][ :start ] + text + lines[i][ end: ]
-
 
 if __name__ == '__main__':
     import sys
