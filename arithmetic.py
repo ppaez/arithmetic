@@ -266,6 +266,14 @@ def TypeAndValueOf( expression ):
     else:
         return 'a', expression
 
+class Parser:
+    'Base class'
+
+def __init__( self ):
+    # Written by parseLine(), read by evaluate():
+    functions = {}
+    variables = {}
+
 def countLines( lines ):
     'Return number of lines.'
     return len( lines )
@@ -283,7 +291,7 @@ def parseLine( i, lines, variables={}, functions={} ):
         'Find and evaluate expresions in line i.'
 
         # get line
-        line = readLine( i, lines )
+        line = self.readLine( i, lines )
 
         RightPrevStart = 0
         RightPrevEnd = 0
@@ -341,7 +349,7 @@ def parseLine( i, lines, variables={}, functions={} ):
                     try:
                         resultado = str( evaluate( valorLeft,
                                     variables=variables, functions=functions ) )
-                        writeResult( i, lines, mEqualSignAct.end(), RightActEnd, resultado )
+                        self.writeResult( i, lines, mEqualSignAct.end(), RightActEnd, resultado )
                     except:
                         print 'eval error:', tipoLeft, valorLeft, tipoRight, valorRight
                 elif tipoLeft == 'n' and tipoRight in 'ifav':
@@ -358,14 +366,14 @@ def parseLine( i, lines, variables={}, functions={} ):
                             if valorLeft in variables:
                                     resultado = variables[ valorLeft ]
                                     resultado = AddCommas( resultado )
-                                    writeResult( i, lines, mEqualSignAct.end(), RightActEnd, resultado )
+                                    self.writeResult( i, lines, mEqualSignAct.end(), RightActEnd, resultado )
 
                     else:                                  # function on the left: evaluate
                         if valorLeft not in functions[ valorLeft ]:
                             try:                # standard formula
                                 resultado = str( evaluate( valorLeft,
                                             variables=variables, functions=functions ) )
-                                writeResult( i, lines, mEqualSignAct.end(), RightActEnd, resultado )
+                                self.writeResult( i, lines, mEqualSignAct.end(), RightActEnd, resultado )
                             except:
                                 print 'eval error:', tipoLeft, valorLeft, tipoRight, valorRight
                         else:                   # recurrence relation
@@ -376,7 +384,7 @@ def parseLine( i, lines, variables={}, functions={} ):
                             else:                                         # iteration
                                 resultado = str( evaluate( functions[ valorLeft ],
                                                  variables=variables, functions=functions ) )
-                                writeResult( i, lines, mEqualSignAct.end(), RightActEnd, resultado )
+                                self.writeResult( i, lines, mEqualSignAct.end(), RightActEnd, resultado )
                                 variables[ valorLeft ] = resultado
 
                 elif tipoLeft == 'n' and tipoRight in 'e': # define a function
@@ -391,7 +399,7 @@ def parseLine( i, lines, variables={}, functions={} ):
                 RightPrevEnd = RightActEnd
 
             # get line
-            line = readLine( i, lines )
+            line = self.readLine( i, lines )
 
             if mEqualSignNext:
                 mEqualSignNext = reEqualSign.search( line, mEqualSignAct.end() )
@@ -402,15 +410,13 @@ def parseLine( i, lines, variables={}, functions={} ):
 def feed( text ):
     'Feed text to the parser.  It is processed line by line.'
 
-    # Initialize
-    # Written by parseLine(), read by evaluate():
-    functions = {}
-    variables = {}
+    # Create instance of parser
+    parser = Parser()
 
     lines = text.splitlines()
 
     for i in range( countLines( lines ) ):
-        parseLine( i, lines, variables=variables, functions=functions )
+        parser.parseLine( i, lines, variables=variables, functions=functions )
 
     return '\n'.join( lines )
 
