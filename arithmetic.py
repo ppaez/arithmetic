@@ -269,142 +269,142 @@ def TypeAndValueOf( expression ):
 class Parser:
     'Base class'
 
-def __init__( self ):
-    # Written by parseLine(), read by evaluate():
-    functions = {}
-    variables = {}
+    def __init__( self ):
+        # Written by parseLine(), read by evaluate():
+        self.functions = {}
+        self.variables = {}
 
-def countLines( lines ):
-    'Return number of lines.'
-    return len( lines )
+    def countLines( self, lines ):
+        'Return number of lines.'
+        return len( lines )
 
-def readLine( i, lines ):
-    'Return i line from lines.'
-    return lines[i]
+    def readLine( self, i, lines ):
+        'Return i line from lines.'
+        return lines[i]
 
-def writeResult( i, lines, start, end, text ):
-    'Write text in line i of lines from start to end offset.'
+    def writeResult( self, i, lines, start, end, text ):
+        'Write text in line i of lines from start to end offset.'
 
-    lines[i] = lines[i][ :start ] + text + lines[i][ end: ]
+        lines[i] = lines[i][ :start ] + text + lines[i][ end: ]
 
-def parseLine( i, lines, variables={}, functions={} ):
-        'Find and evaluate expresions in line i.'
-
-        # get line
-        line = self.readLine( i, lines )
-
-        RightPrevStart = 0
-        RightPrevEnd = 0
-        mEqualSignPrev = re.search( '^', line )
-        mEqualSignAct = reEqualSign.search( line, mEqualSignPrev.end() )
-        while mEqualSignAct:
-
-            # Determine LeftActStart,
-            # the larger of mEqualSignPrev, mSeparLeft, mColonLeft, beginofline
-            LeftStarts = []
-            LeftStarts.append( mEqualSignPrev.end() )
-
-            mSeparLeft = reSepar.search( line, mEqualSignPrev.end(), mEqualSignAct.start() )
-            if mSeparLeft:
-                SeparLeftEnd = mSeparLeft.end()
-                mSeparLeft = reSepar.search( line, mSeparLeft.end(), mEqualSignAct.start() )
-                while mSeparLeft:     # search next
-                    SeparLeftEnd = mSeparLeft.end()
-                    mSeparLeft = reSepar.search( line, mSeparLeft.end(), mEqualSignAct.start() )
-                LeftStarts.append( SeparLeftEnd )
-
-            mColonLeft = reColonLeft.search( line, mEqualSignPrev.end(), mEqualSignAct.start() )
-            if mColonLeft:
-                LeftStarts.append( mColonLeft.end() )
-            mBeginOfLine = re.search( '^ *', line )
-            LeftStarts.append( mBeginOfLine.end() )
-            LeftActStart = max( LeftStarts )
-
-            # Determine RightActEnd,
-            # the smaller of mEqualSignNext, mSeparRight, endofline
-            RightEnds = []
-            mEqualSignNext = reEqualSign.search( line, mEqualSignAct.end() )
-            if mEqualSignNext:
-                RightEnds.append( mEqualSignNext.start() )
-            mSeparRight = reSepar.search( line, mEqualSignAct.end() )
-            if mSeparRight:
-                RightEnds.append( mSeparRight.start() )
-            mEndOfLine = re.search( ' *$', line )
-            RightEnds.append( mEndOfLine.start() )
-            RightActEnd = min( RightEnds )
-
-            rangolibre   = line[ RightPrevEnd          : LeftActStart ]
-            rangoLeft    = line[ LeftActStart          : mEqualSignAct.start() ]
-            rangocentro  = line[ mEqualSignAct.start() : mEqualSignAct.end() ]
-            rangoRight   = line[ mEqualSignAct.end()   : RightActEnd ]
-
-            tipoLeft, valorLeft = TypeAndValueOf( rangoLeft )
-            tipoRight, valorRight = TypeAndValueOf( rangoRight )
-
-            if tipoLeft != 'v': # there is something to the left
-
-                # perform operations
-
-                if tipoLeft in 'eaif' and tipoRight in 'vif':# evaluate expression
-                    try:
-                        resultado = str( evaluate( valorLeft,
-                                    variables=variables, functions=functions ) )
-                        self.writeResult( i, lines, mEqualSignAct.end(), RightActEnd, resultado )
-                    except:
-                        print 'eval error:', tipoLeft, valorLeft, tipoRight, valorRight
-                elif tipoLeft == 'n' and tipoRight in 'ifav':
-                    if valorLeft not in functions:     # variable on the left
-                        if tipoRight != 'v':    # assign to variable
-                            try:
-                                variables[ valorLeft ] = str( evaluate( str( valorRight),
-                                                         variables=variables, functions=functions ) )
-
-                            except:
-                                print 'exec error:', tipoLeft, valorLeft, tipoRight, valorRight
-                                raise
-                        else:                   # evaluate a variable
-                            if valorLeft in variables:
-                                    resultado = variables[ valorLeft ]
-                                    resultado = AddCommas( resultado )
-                                    self.writeResult( i, lines, mEqualSignAct.end(), RightActEnd, resultado )
-
-                    else:                                  # function on the left: evaluate
-                        if valorLeft not in functions[ valorLeft ]:
-                            try:                # standard formula
-                                resultado = str( evaluate( valorLeft,
-                                            variables=variables, functions=functions ) )
-                                self.writeResult( i, lines, mEqualSignAct.end(), RightActEnd, resultado )
-                            except:
-                                print 'eval error:', tipoLeft, valorLeft, tipoRight, valorRight
-                        else:                   # recurrence relation
-                            if valorLeft not in variables:            # initial value
-                              if valorRight != '':
-                                variables[ valorLeft ] = str( evaluate( str( valorRight ),
-                                                         variables=variables, functions=functions ) )
-                            else:                                         # iteration
-                                resultado = str( evaluate( functions[ valorLeft ],
-                                                 variables=variables, functions=functions ) )
-                                self.writeResult( i, lines, mEqualSignAct.end(), RightActEnd, resultado )
-                                variables[ valorLeft ] = resultado
-
-                elif tipoLeft == 'n' and tipoRight in 'e': # define a function
-                        functions[ valorLeft ] = str(valorRight)
-
-                elif tipoLeft == 'n' and tipoRight in 'n': # define an alias
-                        functions[ valorLeft ] = str(valorRight)
-
-
-
-                RightPrevStart = mEqualSignAct.end()
-                RightPrevEnd = RightActEnd
+    def parseLine( self, i, lines, variables={}, functions={} ):
+            'Find and evaluate expresions in line i.'
 
             # get line
             line = self.readLine( i, lines )
 
-            if mEqualSignNext:
+            RightPrevStart = 0
+            RightPrevEnd = 0
+            mEqualSignPrev = re.search( '^', line )
+            mEqualSignAct = reEqualSign.search( line, mEqualSignPrev.end() )
+            while mEqualSignAct:
+
+                # Determine LeftActStart,
+                # the larger of mEqualSignPrev, mSeparLeft, mColonLeft, beginofline
+                LeftStarts = []
+                LeftStarts.append( mEqualSignPrev.end() )
+
+                mSeparLeft = reSepar.search( line, mEqualSignPrev.end(), mEqualSignAct.start() )
+                if mSeparLeft:
+                    SeparLeftEnd = mSeparLeft.end()
+                    mSeparLeft = reSepar.search( line, mSeparLeft.end(), mEqualSignAct.start() )
+                    while mSeparLeft:     # search next
+                        SeparLeftEnd = mSeparLeft.end()
+                        mSeparLeft = reSepar.search( line, mSeparLeft.end(), mEqualSignAct.start() )
+                    LeftStarts.append( SeparLeftEnd )
+
+                mColonLeft = reColonLeft.search( line, mEqualSignPrev.end(), mEqualSignAct.start() )
+                if mColonLeft:
+                    LeftStarts.append( mColonLeft.end() )
+                mBeginOfLine = re.search( '^ *', line )
+                LeftStarts.append( mBeginOfLine.end() )
+                LeftActStart = max( LeftStarts )
+
+                # Determine RightActEnd,
+                # the smaller of mEqualSignNext, mSeparRight, endofline
+                RightEnds = []
                 mEqualSignNext = reEqualSign.search( line, mEqualSignAct.end() )
-            mEqualSignPrev = mEqualSignAct
-            mEqualSignAct  = mEqualSignNext
+                if mEqualSignNext:
+                    RightEnds.append( mEqualSignNext.start() )
+                mSeparRight = reSepar.search( line, mEqualSignAct.end() )
+                if mSeparRight:
+                    RightEnds.append( mSeparRight.start() )
+                mEndOfLine = re.search( ' *$', line )
+                RightEnds.append( mEndOfLine.start() )
+                RightActEnd = min( RightEnds )
+
+                rangolibre   = line[ RightPrevEnd          : LeftActStart ]
+                rangoLeft    = line[ LeftActStart          : mEqualSignAct.start() ]
+                rangocentro  = line[ mEqualSignAct.start() : mEqualSignAct.end() ]
+                rangoRight   = line[ mEqualSignAct.end()   : RightActEnd ]
+
+                tipoLeft, valorLeft = TypeAndValueOf( rangoLeft )
+                tipoRight, valorRight = TypeAndValueOf( rangoRight )
+
+                if tipoLeft != 'v': # there is something to the left
+
+                    # perform operations
+
+                    if tipoLeft in 'eaif' and tipoRight in 'vif':# evaluate expression
+                        try:
+                            resultado = str( evaluate( valorLeft,
+                                        variables=variables, functions=functions ) )
+                            self.writeResult( i, lines, mEqualSignAct.end(), RightActEnd, resultado )
+                        except:
+                            print 'eval error:', tipoLeft, valorLeft, tipoRight, valorRight
+                    elif tipoLeft == 'n' and tipoRight in 'ifav':
+                        if valorLeft not in functions:     # variable on the left
+                            if tipoRight != 'v':    # assign to variable
+                                try:
+                                    variables[ valorLeft ] = str( evaluate( str( valorRight),
+                                                            variables=variables, functions=functions ) )
+
+                                except:
+                                    print 'exec error:', tipoLeft, valorLeft, tipoRight, valorRight
+                                    raise
+                            else:                   # evaluate a variable
+                                if valorLeft in variables:
+                                        resultado = variables[ valorLeft ]
+                                        resultado = AddCommas( resultado )
+                                        self.writeResult( i, lines, mEqualSignAct.end(), RightActEnd, resultado )
+
+                        else:                                  # function on the left: evaluate
+                            if valorLeft not in functions[ valorLeft ]:
+                                try:                # standard formula
+                                    resultado = str( evaluate( valorLeft,
+                                                variables=variables, functions=functions ) )
+                                    self.writeResult( i, lines, mEqualSignAct.end(), RightActEnd, resultado )
+                                except:
+                                    print 'eval error:', tipoLeft, valorLeft, tipoRight, valorRight
+                            else:                   # recurrence relation
+                                if valorLeft not in variables:            # initial value
+                                  if valorRight != '':
+                                    variables[ valorLeft ] = str( evaluate( str( valorRight ),
+                                                            variables=variables, functions=functions ) )
+                                else:                                         # iteration
+                                    resultado = str( evaluate( functions[ valorLeft ],
+                                                    variables=variables, functions=functions ) )
+                                    self.writeResult( i, lines, mEqualSignAct.end(), RightActEnd, resultado )
+                                    variables[ valorLeft ] = resultado
+
+                    elif tipoLeft == 'n' and tipoRight in 'e': # define a function
+                            functions[ valorLeft ] = str(valorRight)
+
+                    elif tipoLeft == 'n' and tipoRight in 'n': # define an alias
+                            functions[ valorLeft ] = str(valorRight)
+
+
+
+                    RightPrevStart = mEqualSignAct.end()
+                    RightPrevEnd = RightActEnd
+
+                # get line
+                line = self.readLine( i, lines )
+
+                if mEqualSignNext:
+                    mEqualSignNext = reEqualSign.search( line, mEqualSignAct.end() )
+                mEqualSignPrev = mEqualSignAct
+                mEqualSignAct  = mEqualSignNext
 
 
 def feed( text ):
@@ -415,8 +415,8 @@ def feed( text ):
 
     lines = text.splitlines()
 
-    for i in range( countLines( lines ) ):
-        parser.parseLine( i, lines, variables=variables, functions=functions )
+    for i in range( parser.countLines( lines ) ):
+        parser.parseLine( i, lines, variables=parser.variables, functions=parser.functions )
 
     return '\n'.join( lines )
 
