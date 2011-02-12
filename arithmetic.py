@@ -453,16 +453,26 @@ class ParserGTK(Parser):
     def readLine( self, i, textBuffer ):
         ''
         iter_start = textBuffer.get_iter_at_line( i )
-        iter_end = textBuffer.get_iter_at_line( i )
-        iter_end.forward_to_line_end()
-        return textBuffer.get_text( iter_start, iter_end )
+        if iter_start.ends_line():
+            return ''
+        else:
+            iter_end = textBuffer.get_iter_at_line( i )
+            iter_end.forward_to_line_end()
+            return textBuffer.get_text( iter_start, iter_end )
 
     def writeResult( self, i, textBuffer, start, end, text ):
         'Write text in line i of lines from start to end offset.'
         # Delete
-        iter_start = textBuffer.get_iter_at_line_offset( i, start )
-        iter_end = textBuffer.get_iter_at_line_offset( i, end )
-        textBuffer.delete( iter_start, iter_end )
+        if end > start:
+            # handle start at end of line or beyond
+            iter_line = textBuffer.get_iter_at_line( i )
+            nchars = iter_line.get_chars_in_line()
+            if start > nchars-1:
+                start = nchars-1
+            iter_start = textBuffer.get_iter_at_line_offset( i, start )
+            iter_end = textBuffer.get_iter_at_line_offset( i, end )
+            textBuffer.delete( iter_start, iter_end )
+
         # Insert
         iter_start = textBuffer.get_iter_at_line_offset( i, start )
         textBuffer.insert( iter_start, text )
