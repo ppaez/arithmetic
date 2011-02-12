@@ -1,4 +1,5 @@
 
+import sys
 import gtk
 import arithmetic
 
@@ -10,6 +11,10 @@ class Editor(object):
         self.builder.add_from_file('editor.ui')
         self.builder.connect_signals(self)
         self.textview = self.builder.get_object( 'textview1' )
+        self.buffer = self.textview.get_buffer()
+        if len( sys.argv ) > 1:
+            text = open( sys.argv[1] ).read()
+            self.buffer.set_text( text )
 
 
     def run(self):
