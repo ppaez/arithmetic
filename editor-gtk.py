@@ -30,8 +30,9 @@ class Editor(object):
     def on_window1_delete_event(self, *args):
         self.quit()
 
-    def on_window1_button_press_event(self, *args):
-        self.do_arithmetic()
+    def on_window1_key_press_event(self, widget, event, *args):
+        if event.keyval == gtk.keysyms.F5:
+            self.do_arithmetic()
 
     def do_arithmetic(self):
         'Perform arithmetic operations'
