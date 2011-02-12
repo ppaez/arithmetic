@@ -38,16 +38,9 @@ class Editor(object):
         insert_iter = buf.get_iter_at_mark( buf.get_insert() )
         offset = insert_iter.get_offset()
 
-        # get the text
-        txt = buf.get_text(buf.get_start_iter(),
-                           buf.get_end_iter())
-
-        # parse and return modified text
-        parser = arithmetic.Parser()
-        txt = parser.parse( txt )
-
-        # insert text back
-        buf.set_text( txt )
+        # parse and modify the text
+        parser = arithmetic.ParserGTK()
+        txt = parser.parse( buf )
 
         # set cursor position to previous offset
         insert_iter = buf.get_iter_at_offset( offset )

@@ -438,6 +438,35 @@ class ParserTk(Parser):
         textWidget.delete( str(i) + '.' + str(start), str(i) + '.' + str(end) )
         textWidget.insert( str(i) + '.' + str(start), text )
 
+class ParserGTK(Parser):
+    ''
+
+    def parse( self, textBuffer ):
+        ''
+        for i in range( self.countLines( textBuffer ) ):
+            self.parseLine( i, textBuffer, variables=self.variables, functions=self.functions )
+
+    def countLines( self, textBuffer ):
+        ''
+        return textBuffer.get_line_count()
+
+    def readLine( self, i, textBuffer ):
+        ''
+        iter_start = textBuffer.get_iter_at_line( i )
+        iter_end = textBuffer.get_iter_at_line( i )
+        iter_end.forward_to_line_end()
+        return textBuffer.get_text( iter_start, iter_end )
+
+    def writeResult( self, i, textBuffer, start, end, text ):
+        'Write text in line i of lines from start to end offset.'
+        # Delete
+        iter_start = textBuffer.get_iter_at_line_offset( i, start )
+        iter_end = textBuffer.get_iter_at_line_offset( i, end )
+        textBuffer.delete( iter_start, iter_end )
+        # Insert
+        iter_start = textBuffer.get_iter_at_line_offset( i, start )
+        textBuffer.insert( iter_start, text )
+
 def feed( text ):
     'Feed text to the parser.  It is processed line by line.'
 
