@@ -38,9 +38,8 @@ def Recalculate( event ):
     Read text buffer, calculate, update the text buffer.'''
 
     cursorPosition = texto.index( 'insert' )
-    text = texto.get( '1.0', Tkinter.END )
-    texto.delete( '1.0', Tkinter.END )
-    texto.insert( Tkinter.END, arithmetic.feed( text ) )
+    parser = arithmetic.ParserTk()
+    parser.parse( texto )
     texto.mark_set( 'insert', cursorPosition )
 
 def Quit( event ):
@@ -73,7 +72,7 @@ if len(sys.argv) > 1:
         pass  # new file
 else:
     filename = 'unnamed'
-root.title( filename + ' - Libreta 0.2' )
+root.title( filename + ' - Libreta 0.5' )
 
 
 root.mainloop()

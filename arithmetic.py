@@ -417,6 +417,27 @@ class Parser:
                 mEqualSignAct  = mEqualSignNext
 
 
+class ParserTk(Parser):
+    ''
+
+    def parse( self, textWidget ):
+        ''
+        for i in range( self.countLines( textWidget ) ):
+            self.parseLine( i, textWidget, variables=self.variables, functions=self.functions )
+
+    def countLines( self, textWidget ):
+        ''
+        return int(textWidget.index( 'end' ).split('.')[0])
+
+    def readLine( self, i, textWidget ):
+        ''
+        return textWidget.get( str(i) + '.0', str(i) + '.end'   )
+
+    def writeResult( self, i, textWidget, start, end, text ):
+        'Write text in line i of lines from start to end offset.'
+        textWidget.delete( str(i) + '.' + str(start), str(i) + '.' + str(end) )
+        textWidget.insert( str(i) + '.' + str(start), text )
+
 def feed( text ):
     'Feed text to the parser.  It is processed line by line.'
 
