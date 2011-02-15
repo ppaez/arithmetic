@@ -58,59 +58,59 @@ class Lexer:
         self.text = text
         self.offset = 0
 
-def gettoken( doc ):
-    '''Get next token from text and return its type and value.
-    
-    Return (None,None) if no more text.
-    
-    doc has text and offset attributes.
+    def gettoken( doc ):
+        '''Get next token from text and return its type and value.
 
-    Identifiers    letter ( letter | digit | _ )*
-    Numbers        digit ( digit | , | . ) *
-    Operators      - + * / ^ ** x
-    
-    x can be a name or an operator
+        Return (None,None) if no more text.
 
-    x preceeded and followed by a digit is taken as if
-    preceeded and followed by a space.  i.e 5x3
-    is seen as 5 x 3.
-    '''
-    while doc.offset < len( doc.text ):
-        if doc.text[ doc.offset ] == ' ':
-            value = doc.text[ doc.offset ]
+        doc has text and offset attributes.
+
+        Identifiers    letter ( letter | digit | _ )*
+        Numbers        digit ( digit | , | . ) *
+        Operators      - + * / ^ ** x
+
+        x can be a name or an operator
+
+        x preceeded and followed by a digit is taken as if
+        preceeded and followed by a space.  i.e 5x3
+        is seen as 5 x 3.
+        '''
+        while doc.offset < len( doc.text ):
+            if doc.text[ doc.offset ] == ' ':
+                value = doc.text[ doc.offset ]
+                doc.offset = doc.offset + 1
+                continue
+            if doc.text[ doc.offset ] == '\n':
+                value = doc.text[ doc.offset ]
+                doc.offset = doc.offset + 1
+                return ( 'r', value )
+            m = renumber.match( doc.text, doc.offset )
+            if m:
+                value = m.group()
+                doc.offset = m.end()
+                return ( 'f', value )
+            m = rexenclosed.match( doc.text, doc.offset - 1 )
+            if m:
+                value = m.group(1)
+                doc.offset = m.end(1)
+                return ( 'x', value )
+            m = reidentifier.match( doc.text, doc.offset )
+            if m:
+                value = m.group()
+                doc.offset = m.end()
+                return ( 'n', value )
+            if doc.text[ doc.offset: doc.offset + 2 ] == '**':
+                value = doc.text[ doc.offset: doc.offset + 2 ]
+                doc.offset = doc.offset + 2
+                return ( 'o', value )
+            if doc.text[ doc.offset ] in '+-*/^()':
+                value = doc.text[ doc.offset ]
+                doc.offset = doc.offset + 1
+                return ( 'o', value )
+            value = doc.text[ doc.offset ] + '***'
             doc.offset = doc.offset + 1
-            continue
-        if doc.text[ doc.offset ] == '\n':
-            value = doc.text[ doc.offset ]
-            doc.offset = doc.offset + 1
-            return ( 'r', value )
-        m = renumber.match( doc.text, doc.offset )
-        if m:
-            value = m.group()
-            doc.offset = m.end()
-            return ( 'f', value )
-        m = rexenclosed.match( doc.text, doc.offset - 1 )
-        if m:
-            value = m.group(1)
-            doc.offset = m.end(1)
-            return ( 'x', value )
-        m = reidentifier.match( doc.text, doc.offset )
-        if m:
-            value = m.group()
-            doc.offset = m.end()
-            return ( 'n', value )
-        if doc.text[ doc.offset: doc.offset + 2 ] == '**':
-            value = doc.text[ doc.offset: doc.offset + 2 ]
-            doc.offset = doc.offset + 2
-            return ( 'o', value )
-        if doc.text[ doc.offset ] in '+-*/^()':
-            value = doc.text[ doc.offset ]
-            doc.offset = doc.offset + 1
-            return ( 'o', value )
-        value = doc.text[ doc.offset ] + '***' 
-        doc.offset = doc.offset + 1
-        return ( 'u', value )
-    return ( '', None )
+            return ( 'u', value )
+        return ( '', None )
 
 
 t = ''
