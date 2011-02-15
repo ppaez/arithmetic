@@ -58,12 +58,10 @@ class Lexer:
         self.text = text
         self.offset = 0
 
-    def gettoken( doc ):
+    def gettoken( self ):
         '''Get next token from text and return its type and value.
 
         Return (None,None) if no more text.
-
-        doc has text and offset attributes.
 
         Identifiers    letter ( letter | digit | _ )*
         Numbers        digit ( digit | , | . ) *
@@ -75,46 +73,59 @@ class Lexer:
         preceeded and followed by a space.  i.e 5x3
         is seen as 5 x 3.
         '''
-        while doc.offset < len( doc.text ):
-            if doc.text[ doc.offset ] == ' ':
-                value = doc.text[ doc.offset ]
-                doc.offset = doc.offset + 1
+        while self.offset < len( self.text ):
+            if self.text[ self.offset ] == ' ':
+                value = self.text[ self.offset ]
+                self.offset = self.offset + 1
                 continue
-            if doc.text[ doc.offset ] == '\n':
-                value = doc.text[ doc.offset ]
-                doc.offset = doc.offset + 1
-                return ( 'r', value )
-            m = renumber.match( doc.text, doc.offset )
+            if self.text[ self.offset ] == '\n':
+                value = self.text[ self.offset ]
+                self.offset = self.offset + 1
+                self.type = 'r'
+                self.value = value
+                return
+            m = renumber.match( self.text, self.offset )
             if m:
                 value = m.group()
-                doc.offset = m.end()
-                return ( 'f', value )
-            m = rexenclosed.match( doc.text, doc.offset - 1 )
+                self.offset = m.end()
+                self.type = 'f'
+                self.value = value
+                return
+            m = rexenclosed.match( self.text, self.offset - 1 )
             if m:
                 value = m.group(1)
-                doc.offset = m.end(1)
-                return ( 'x', value )
-            m = reidentifier.match( doc.text, doc.offset )
+                self.offset = m.end(1)
+                self.type = 'x'
+                self.value = value
+                return
+            m = reidentifier.match( self.text, self.offset )
             if m:
                 value = m.group()
-                doc.offset = m.end()
-                return ( 'n', value )
-            if doc.text[ doc.offset: doc.offset + 2 ] == '**':
-                value = doc.text[ doc.offset: doc.offset + 2 ]
-                doc.offset = doc.offset + 2
-                return ( 'o', value )
-            if doc.text[ doc.offset ] in '+-*/^()':
-                value = doc.text[ doc.offset ]
-                doc.offset = doc.offset + 1
-                return ( 'o', value )
-            value = doc.text[ doc.offset ] + '***'
-            doc.offset = doc.offset + 1
-            return ( 'u', value )
-        return ( '', None )
+                self.offset = m.end()
+                self.type = 'n'
+                self.value = value
+                return
+            if self.text[ self.offset: self.offset + 2 ] == '**':
+                value = self.text[ self.offset: self.offset + 2 ]
+                self.offset = self.offset + 2
+                self.type = 'o'
+                self.value = value
+                return
+            if self.text[ self.offset ] in '+-*/^()':
+                value = self.text[ self.offset ]
+                self.offset = self.offset + 1
+                self.type = 'o'
+                self.value = value
+                return
+            value = self.text[ self.offset ] + '***'
+            self.offset = self.offset + 1
+            self.type = 'u'
+            self.value = value
+            return
+        self.type = ''
+        self.value = None
 
 
-t = ''
-v = ''
 from decimal import Decimal, getcontext
 getcontext().prec = 100
 
@@ -124,41 +135,37 @@ def evaluate( expression_text, UseDigitGrouping = True, variables = {}, function
     if UseDigitGrouping is True, the result includes commas.
 
     '''
-    global text
-    global t, v
-    tokens = []
     expression = []
 
-    doc = Lexer( expression_text )
+    lexer = Lexer( expression_text )
 
     def factor():
-        global t, v
-        if v in '-+':
-            expression.append( v )
-            t, v = gettoken( doc )
-        if t == 'f':
+        if lexer.value in '-+':
+            expression.append( lexer.value )
+            lexer.gettoken()
+        if lexer.type == 'f':
             #  remove commas and spaces
             #  translate % to /100'''
-            value = v.replace( '%', '' )
+            value = lexer.value.replace( '%', '' )
             value = value.replace( ' ', '' )
             expression.append( value.replace( ',', '' ) )
-            if v[-1] == '%':
+            if lexer.value[-1] == '%':
                 expression.append( '/' )
                 expression.append( '100' )
-            t, v = gettoken( doc )
-        elif v == '(':
-            expression.append( v )
-            t, v = gettoken( doc )
+            lexer.gettoken()
+        elif lexer.value == '(':
+            expression.append( lexer.value )
+            lexer.gettoken()
             expr()
-            expression.append( v )
-            t, v = gettoken( doc )
-        elif t == 'n':
-            name = v
-            t, v = gettoken( doc )
+            expression.append( lexer.value )
+            lexer.gettoken()
+        elif lexer.type == 'n':
+            name = lexer.value
+            lexer.gettoken()
             # handle multiple word names
-            while t == 'n' and v != 'x':
-                name = name + ' ' + v
-                t, v = gettoken( doc )
+            while lexer.type == 'n' and lexer.value != 'x':
+                name = name + ' ' + lexer.value
+                lexer.gettoken()
             if name in variables:
                 # remove commas
                 value = variables[ name ].replace( ',', '' )
@@ -166,13 +173,9 @@ def evaluate( expression_text, UseDigitGrouping = True, variables = {}, function
             elif name in functions:
                 if name not in functions[ name ]:
                     # standard formula
-                    doc.v = v
-                    doc.t = t
                     expression.append( str( evaluate( functions[ name ],
                                        UseDigitGrouping = False,
                                        variables=variables, functions=functions ) ) )
-                    v = doc.v
-                    t = doc.t
                 else:
                     # recurrent relation wihout initial value
                     expression.append( '0' )
@@ -180,10 +183,9 @@ def evaluate( expression_text, UseDigitGrouping = True, variables = {}, function
                 expression.append( name + ' undefined' )
 
     def factors():
-        global t, v
-        if v == '^' or v == '**':
+        if lexer.value == '^' or lexer.value == '**':
             expression.append( '**' )
-            t, v = gettoken( doc )
+            lexer.gettoken()
             power()
 
     def power():
@@ -191,10 +193,9 @@ def evaluate( expression_text, UseDigitGrouping = True, variables = {}, function
         factors()
 
     def powers():
-        global t, v
-        if v and v in '*x/':
-            expression.append( v.replace( 'x', '*') )
-            t, v = gettoken( doc )
+        if lexer.value and lexer.value in '*x/':
+            expression.append( lexer.value.replace( 'x', '*') )
+            lexer.gettoken()
             power()
             powers()
 
@@ -203,10 +204,9 @@ def evaluate( expression_text, UseDigitGrouping = True, variables = {}, function
         powers()
 
     def terms():
-        global t, v
-        if v and v in '-+':
-            expression.append( v )
-            t, v = gettoken( doc )
+        if lexer.value and lexer.value in '-+':
+            expression.append( lexer.value )
+            lexer.gettoken()
             term()
             terms()
 
@@ -214,7 +214,7 @@ def evaluate( expression_text, UseDigitGrouping = True, variables = {}, function
         term()
         terms()
 
-    t, v = gettoken( doc )
+    lexer.gettoken()
     expr()
 
     expressionD = []
@@ -250,18 +250,16 @@ def TypeAndValueOf( expression ):
     value is expression with some modifications:
     blank spaces and commas removed, x replaced by *.'''
 
-    class doc:
-        text = expression
-        offset = 0
+    lexer = Lexer( expression )
 
     # Capture the odd token types
-    doc.text = re.sub( '[()]', '', doc.text )
-    t, v = gettoken( doc )
-    oddtokens = t
-    while t:
-        t, v = gettoken( doc )
-        t, v = gettoken( doc )
-        oddtokens = oddtokens + t
+    lexer.text = re.sub( '[()]', '', lexer.text )
+    lexer.gettoken()
+    oddtokens = lexer.type
+    while lexer.type:
+        lexer.gettoken()
+        lexer.gettoken()
+        oddtokens = oddtokens + lexer.type
 
     if oddtokens == '':  # empty
         return 'v', ''
