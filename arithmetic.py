@@ -162,9 +162,13 @@ def evaluate( expression_text, UseDigitGrouping = True, variables = {}, function
             elif name in functions:
                 if name not in functions[ name ]:
                     # standard formula
+                    doc.v = v
+                    doc.t = t
                     expression.append( str( evaluate( functions[ name ],
                                        UseDigitGrouping = False,
                                        variables=variables, functions=functions ) ) )
+                    v = doc.v
+                    t = doc.t
                 else:
                     # recurrent relation wihout initial value
                     expression.append( '0' )
