@@ -52,6 +52,12 @@ renumber = re.compile( r'([0-9][0-9,]*(\.[0-9]*)?%?)|(\.[0-9]+%?)' )
 reidentifier = re.compile( r'[a-zA-Z][a-zA-Z0-9_]*' )
 rexenclosed = re.compile( r'[0-9.)](x)[^a-zA-Z]' )
 
+class Lexer:
+    ''
+    def __init__( self, text ):
+        self.text = text
+        self.offset = 0
+
 def gettoken( doc ):
     '''Get next token from text and return its type and value.
     
@@ -123,9 +129,7 @@ def evaluate( expression_text, UseDigitGrouping = True, variables = {}, function
     tokens = []
     expression = []
 
-    class doc:
-        text = expression_text
-        offset = 0
+    doc = Lexer( expression_text )
 
     def factor():
         global t, v
