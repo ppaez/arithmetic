@@ -40,17 +40,9 @@ class Editor(object):
         # get the buffer
         buf = self.textview.get_buffer()
 
-        # get cursor position as offset
-        insert_iter = buf.get_iter_at_mark( buf.get_insert() )
-        offset = insert_iter.get_offset()
-
         # parse and modify the text
         parser = arithmetic.ParserGTK()
         txt = parser.parse( buf )
-
-        # set cursor position to previous offset
-        insert_iter = buf.get_iter_at_offset( offset )
-        buf.place_cursor( insert_iter )
 
 if __name__ == '__main__':
         editor = Editor()

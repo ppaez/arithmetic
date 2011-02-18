@@ -37,10 +37,8 @@ def Recalculate( event ):
 
     Read text buffer, calculate, update the text buffer.'''
 
-    cursorPosition = texto.index( 'insert' )
     parser = arithmetic.ParserTk()
     parser.parse( texto )
-    texto.mark_set( 'insert', cursorPosition )
 
 def Quit( event ):
     'End the application.'
