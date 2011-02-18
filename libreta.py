@@ -21,16 +21,16 @@ import arithmetic
 def loadFile( event):
     'Load file content into the buffer.'
 
-    cursorPosition = texto.index( 'insert' )
-    text = open( filename ).read()
-    texto.delete( '1.0', Tkinter.END )
-    texto.insert( "1.0", text)
-    texto.mark_set( 'insert', cursorPosition )
+    cursorPosition = event.widget.index( 'insert' )
+    text = open( event.widget.filename ).read()
+    event.widget.delete( '1.0', Tkinter.END )
+    event.widget.insert( "1.0", text)
+    event.widget.mark_set( 'insert', cursorPosition )
 
 def saveFile( event):
     'Save the text buffer contents.'
     text = open( filename, 'w' )
-    text.write( texto.get( '1.0', Tkinter.END  ) )
+    text.write( event.widget.get( '1.0', Tkinter.END  ) )
 
 def Recalculate( event ):
     '''Find arithmetic expressions and evalute them.
@@ -38,7 +38,7 @@ def Recalculate( event ):
     Read text buffer, calculate, update the text buffer.'''
 
     parser = arithmetic.ParserTk()
-    parser.parse( texto )
+    parser.parse( event.widget )
 
 def Quit( event ):
     'End the application.'
@@ -46,31 +46,37 @@ def Quit( event ):
 
 # Build a simple editor window
 import Tkinter
+
+class Editor(object):
+    'A minimal editor'
+
+    def __init__(self, root):
+        self.texto = Tkinter.Text(root, height=40)
+        self.texto.pack()
+        self.texto.focus_set()
+
+        # Minimal configuration and key bindings
+        self.texto['font'] = ("lucida console", 11)
+        self.texto['wrap'] = Tkinter.NONE
+        self.texto.bind('<Control-l>', loadFile)
+        self.texto.bind('<Control-s>', saveFile)
+        self.texto.bind('<Control-q>', Quit)
+        self.texto.bind( '<F5>', Recalculate)
+
+        # Handle single parameter: filename
+        import sys
+        if len(sys.argv) > 1:
+            self.texto.filename = sys.argv[1]
+            try:
+                text = open( self.texto.filename ).read()
+                self.texto.insert( Tkinter.END, text )
+            except:
+                pass  # new file
+        else:
+            self.texto.filename = 'unnamed'
+        root.title( self.texto.filename + ' - Libreta 0.5' )
+
+
 root = Tkinter.Tk()
-texto = Tkinter.Text(root, height=40)
-texto.pack()
-texto.focus_set()
-
-# Minimal configuration and key bindings
-texto['font'] = ("lucida console", 11)
-texto['wrap'] = Tkinter.NONE
-texto.bind('<Control-l>', loadFile)
-texto.bind('<Control-s>', saveFile)
-texto.bind('<Control-q>', Quit)
-texto.bind( '<F5>', Recalculate)
-
-# Handle single parameter: filename
-import sys
-if len(sys.argv) > 1:
-    filename = sys.argv[1]
-    try:
-        text = open( filename ).read()
-        texto.insert( Tkinter.END, text )
-    except:
-        pass  # new file
-else:
-    filename = 'unnamed'
-root.title( filename + ' - Libreta 0.5' )
-
-
+editor = Editor(root)
 root.mainloop()
