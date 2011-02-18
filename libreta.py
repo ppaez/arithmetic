@@ -15,6 +15,7 @@
 #   You should have received a copy of the GNU General Public License
 #   along with this program.  If not, see <http://www.gnu.org/licenses/>
 
+import Tkinter
 import arithmetic
 
 
@@ -29,29 +30,16 @@ def loadFile( event):
 
 def saveFile( event):
     'Save the text buffer contents.'
-    text = open( filename, 'w' )
+    text = open( event.widget.filename, 'w' )
     text.write( event.widget.get( '1.0', Tkinter.END  ) )
 
-def Recalculate( event ):
-    '''Find arithmetic expressions and evalute them.
-
-    Read text buffer, calculate, update the text buffer.'''
-
-    parser = arithmetic.ParserTk()
-    parser.parse( event.widget )
-
-def Quit( event ):
-    'End the application.'
-    root.quit()
-
-# Build a simple editor window
-import Tkinter
 
 class Editor(object):
     'A minimal editor'
 
-    def __init__(self, root):
-        self.texto = Tkinter.Text(root, height=40)
+    def __init__(self):
+        self.root = Tkinter.Tk()
+        self.texto = Tkinter.Text(self.root, height=40)
         self.texto.pack()
         self.texto.focus_set()
 
@@ -60,8 +48,8 @@ class Editor(object):
         self.texto['wrap'] = Tkinter.NONE
         self.texto.bind('<Control-l>', loadFile)
         self.texto.bind('<Control-s>', saveFile)
-        self.texto.bind('<Control-q>', Quit)
-        self.texto.bind( '<F5>', Recalculate)
+        self.texto.bind('<Control-q>', self.quit)
+        self.texto.bind( '<F5>', calculate)
 
         # Handle single parameter: filename
         import sys
@@ -74,9 +62,20 @@ class Editor(object):
                 pass  # new file
         else:
             self.texto.filename = 'unnamed'
-        root.title( self.texto.filename + ' - Libreta 0.5' )
+        self.root.title( self.texto.filename + ' - Libreta 0.5' )
 
+    def run(self):
+        self.root.mainloop()
 
-root = Tkinter.Tk()
-editor = Editor(root)
-root.mainloop()
+    def quit( self, event ):
+        'End the application.'
+        self.root.quit()
+
+def calculate( event ):
+    'Perform arithmetic operations'
+
+    parser = arithmetic.ParserTk()
+    parser.parse( event.widget )
+
+editor = Editor()
+editor.run()
