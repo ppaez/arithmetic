@@ -32,17 +32,14 @@ class Editor(object):
 
     def on_window1_key_press_event(self, widget, event, *args):
         if event.keyval == gtk.keysyms.F5:
-            self.do_arithmetic()
+            do_arithmetic( self.buffer )
 
-    def do_arithmetic(self):
-        'Perform arithmetic operations'
+def do_arithmetic( buf ):
+    'Perform arithmetic operations'
 
-        # get the buffer
-        buf = self.textview.get_buffer()
-
-        # parse and modify the text
-        parser = arithmetic.ParserGTK()
-        txt = parser.parse( buf )
+    # parse and modify the text
+    parser = arithmetic.ParserGTK()
+    txt = parser.parse( buf )
 
 if __name__ == '__main__':
         editor = Editor()
