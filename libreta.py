@@ -15,6 +15,7 @@
 #   You should have received a copy of the GNU General Public License
 #   along with this program.  If not, see <http://www.gnu.org/licenses/>
 
+import sys
 import Tkinter
 import arithmetic
 
@@ -52,7 +53,6 @@ class Editor(object):
         self.texto.bind( '<F5>', calculate)
 
         # Handle single parameter: filename
-        import sys
         if len(sys.argv) > 1:
             self.texto.filename = sys.argv[1]
             try:
@@ -62,7 +62,7 @@ class Editor(object):
                 pass  # new file
         else:
             self.texto.filename = 'unnamed'
-        self.root.title( self.texto.filename + ' - Libreta 0.5' )
+        self.root.title( self.texto.filename + ' - editor-Tk' )
 
     def run(self):
         self.root.mainloop()
