@@ -483,6 +483,30 @@ class ParserGTK(Parser):
         iter_start = textBuffer.get_iter_at_line_offset( i, start )
         textBuffer.insert( iter_start, text )
 
+class ParserWx(Parser):
+    ''
+
+    def parse( self, TextControl ):
+        ''
+        for i in range( self.countLines( TextControl ) ):
+            self.parseLine( i, TextControl, variables=self.variables, functions=self.functions )
+
+    def countLines( self, TextControl ):
+        ''
+        return TextControl.GetNumberOfLines()
+
+    def readLine( self, i, TextControl ):
+        ''
+        return TextControl.GetLineText(i)
+
+    def writeResult( self, i, TextControl, start, end, text ):
+        'Write text in line i of lines from start to end offset.'
+
+        # Convert line, column to offset
+        startOffset = TextControl.XYToPosition( start, i)
+        endOffset = TextControl.XYToPosition( end, i)
+        TextControl.Replace( startOffset, endOffset, text )
+
 def feed( text ):
     'Feed text to the parser.  It is processed line by line.'
 

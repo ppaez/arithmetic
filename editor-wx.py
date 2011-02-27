@@ -1,7 +1,7 @@
 #! /usr/bin/env python
 
 import wx
-from arithmetic import Parser
+from arithmetic import ParserWx
 
 class Editor(wx.Frame):
     'A minimal editor.'
@@ -14,15 +14,8 @@ class Editor(wx.Frame):
 def calculate(event):
     if event.GetKeyCode() == wx.WXK_F5:
         control = event.GetEventObject()
-        nlines = control.GetNumberOfLines()
-        lines = []
-        for i in range(nlines):
-            lines.append( control.GetLineText(i) )
-        text = '\n'.join( lines )
-        parser = Parser()
-        text = parser.parse(text)
-        end = control.GetLastPosition()
-        control.Replace( 0, end, text )
+        parser = ParserWx()
+        parser.parse( control )
     event.Skip()
 
 app = wx.App(False)
