@@ -17,6 +17,5 @@
     </child>
   </object>
   <object class="GtkTextBuffer" id="textbuffer1">
-    <property name="text" translatable="yes">4+5=</property>
   </object>
 </interface>
