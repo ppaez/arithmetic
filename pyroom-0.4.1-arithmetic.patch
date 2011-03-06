@@ -1,50 +1,42 @@
 diff --git a/PyRoom/basic_edit.py b/PyRoom/basic_edit.py
-index b764828..9fbd6b0 100644
+index b764828..4abcdd4 100644
 --- a/PyRoom/basic_edit.py
 +++ b/PyRoom/basic_edit.py
-@@ -28,6 +28,9 @@ within this file
+@@ -28,6 +28,7 @@ within this file
  import gtk
  import os
  import urllib
-+import sys
-+sys.path.append( '/home/pp/varios-python/libreta-web' )
-+import arithmetic
++from arithmetic import ParserGTK
  
  from pyroom_error import PyroomError
  from gui import GUI
-@@ -113,6 +116,7 @@ def make_accel_group(edit_instance):
+@@ -49,6 +50,7 @@ _('Control-Shift-S: Save current buffer as'),
+ _('Control-W: Close buffer and exit if it was the last buffer'),
+ _('Control-Y: Redo last typing'),
+ _('Control-Z: Undo last typing'),
++_('Control-T: do arithmetic operations'),
+ _('Control-Page Up: Switch to previous buffer'),
+ _('Control-Page Down: Switch to next buffer'), ])
+ 
+@@ -113,6 +115,7 @@ def make_accel_group(edit_instance):
          'p': edit_instance.preferences.show,
          'q': edit_instance.dialog_quit,
          's': edit_instance.save_file,
-+        't': edit_instance.do_arithmetic,
++        't': edit_instance.calculate,
          'w': edit_instance.close_dialog,
          'y': edit_instance.redo,
          'z': edit_instance.undo,
-@@ -789,3 +793,27 @@ continue editing your document.")
+@@ -789,3 +792,13 @@ continue editing your document.")
          """cleanup before quitting"""
          autosave.stop_autosave(self)
          state['gui'].quit()
 +
-+    def do_arithmetic(self):
++    def calculate(self):
 +        """Perform arithmetic operations"""
 +
 +        # get the buffer
 +        buf = self.buffers[self.current]
 +
-+        # get cursor position as offset
-+        insert_iter = buf.get_iter_at_mark( buf.get_insert() )
-+        offset = insert_iter.get_offset()
-+
-+        # get the text
-+        txt = buf.get_text(buf.get_start_iter(),
-+                           buf.get_end_iter())
-+
-+        # parse and return modified text
-+        txt = arithmetic.feed( txt )
-+
-+        # insert text back
-+        buf.set_text( txt )
-+
-+        # set cursor position to previous offset
-+        insert_iter = buf.get_iter_at_offset( offset )
-+        buf.place_cursor( insert_iter )
++        # parse and update the buffer
++        parser = ParserGTK()
++        parser.parse( buf )
