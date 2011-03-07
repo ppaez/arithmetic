@@ -82,8 +82,10 @@ Tutorials
 ~~~~~~~~~
 
 There is no need to install the module in your system, if you
-just want to try the module first.  The simplest demo is using
-a text file as input, the output is sent to the standard output::
+just want to try the module first.  Change into the source
+directory before doing the following commands.  The simplest
+demo is using a text file as input, the output is sent to the
+standard output::
 
  ./arithmetic -f tutorial-1
 

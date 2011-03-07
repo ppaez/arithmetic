@@ -3,3 +3,7 @@ include CHANGELOG
 include tutorial-1
 include tutorial-2
 include arithmetic
+include pyroom-0.4.1-arithmetic.patch
+include calc.py
+include manual.rst
+include manual.html

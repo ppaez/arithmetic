@@ -4,8 +4,9 @@ Introduction
 arithmetic is a Python module that allows mixing arithmetic
 operations and text.  It resembles the calculator program bc.
 
-A sample Tk-based editor that uses the module is provided as
-a starting point.
+Tk, GTK and wxWidgets based sample editors that use the module
+are provided as a starting point.  A plugin for Zim and a patch for PyRoom
+editors.
 
 Tutorial documents are included, they will quickly show
 all the features of arithmetic.
@@ -14,24 +15,8 @@ all the features of arithmetic.
 Using the tutorials
 -------------------
 
-Open files tutorial-1 and tutorial-2 with Libreta,
-the editor application included with the module.
-
-There is no need to install the module, Libreta runs
-as is from the source directory:
-
--  In GNU/Linux:  open a terminal, cd to the source 
-   directory and type the following commands:
-
-   ./libreta.py tutorial-1
-   ./libreta.py tutorial-2
-
--  In Windows: explore the source directory and drag
-   the tutorial file over the libreta.py icon.
-
-Tkinter is required. you might need to install package
-python-tk in GNU/Linux. Tkinter is automatically installed
-in Windows.
+Please check the manual in the manual.rst or
+manual.html files for more information.
 
 
 Downloading
