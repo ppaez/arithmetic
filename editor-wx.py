@@ -5,6 +5,7 @@ from arithmetic import ParserWx
 
 class Editor(wx.Frame):
     'A minimal editor.'
+
     def __init__(self, parent, title):
          wx.Frame.__init__(self, parent, title=title, size=(800,600))
          self.control = wx.TextCtrl(self, style=wx.TE_MULTILINE)
@@ -12,10 +13,12 @@ class Editor(wx.Frame):
          self.Show(True)
 
 def calculate(event):
+    'Perform arithmetic operations'
+
     if event.GetKeyCode() == wx.WXK_F5:
-        control = event.GetEventObject()
+        textcontrol = event.GetEventObject()
         parser = ParserWx()
-        parser.parse( control )
+        parser.parse( textcontrol )
     event.Skip()
 
 app = wx.App(False)
