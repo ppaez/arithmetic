@@ -17,8 +17,8 @@ class Editor(object):
         self.builder.add_from_file( uiFilePath )
         self.builder.connect_signals(self)
         self.textview = self.builder.get_object( 'textview1' )
-        self.textview.connect( "key_press_event", self.on_window1_key_press_event )
         self.buffer = self.textview.get_buffer()
+        self.textview.connect( "key_press_event", calculate, self.buffer )
         if len( sys.argv ) > 1:
             text = open( sys.argv[1] ).read()
             self.buffer.set_text( text )
@@ -37,15 +37,12 @@ class Editor(object):
     def on_window1_delete_event(self, *args):
         self.quit()
 
-    def on_window1_key_press_event(self, widget, event, *args):
-        if event.keyval == gtk.keysyms.F5:
-            calculate( self.buffer )
-
-def calculate( buf ):
+def calculate( widget, event, textbuffer ):
     'Perform arithmetic operations'
 
-    parser = arithmetic.ParserGTK()
-    parser.parse( buf )
+    if event.keyval == gtk.keysyms.F5:
+        parser = arithmetic.ParserGTK()
+        parser.parse( textbuffer )
 
 if __name__ == '__main__':
         editor = Editor()
