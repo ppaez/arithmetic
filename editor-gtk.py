@@ -17,6 +17,7 @@ class Editor(object):
         self.builder.add_from_file( uiFilePath )
         self.builder.connect_signals(self)
         self.textview = self.builder.get_object( 'textview1' )
+        self.textview.connect( "key_press_event", self.on_window1_key_press_event )
         self.buffer = self.textview.get_buffer()
         if len( sys.argv ) > 1:
             text = open( sys.argv[1] ).read()

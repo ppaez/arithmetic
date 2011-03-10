@@ -6,7 +6,6 @@
     <property name="visible">True</property>
     <property name="default_width">800</property>
     <property name="default_height">600</property>
-    <signal name="key_press_event" handler="on_window1_key_press_event"/>
     <signal name="delete_event" handler="on_window1_delete_event"/>
     <child>
       <object class="GtkTextView" id="textview1">
