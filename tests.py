@@ -43,6 +43,38 @@ class Lexer( unittest.TestCase):
         self.assertEqual( lexer.value, '+' )
         self.assertEqual( lexer.type, 'o' )
 
+class Evaluate( unittest.TestCase):
+
+    def test_evaluate_numeric(self):
+        from arithmetic import evaluate
+        res = evaluate('5+2')
+        self.assertEqual( res, '7' )
+
+    def test_evaluate_variable(self):
+        from arithmetic import evaluate
+        res = evaluate('a', variables={'a':'1'})
+        self.assertEqual( res, '1' )
+
+    def test_evaluate_variable_plus(self):
+        from arithmetic import evaluate
+        res = evaluate('f+1', variables={'f':'1'})
+        self.assertEqual( res, '2' )
+
+    def test_evaluate_function(self):
+        from arithmetic import evaluate
+        res = evaluate('f', variables={'a':'1'}, functions={'f': 'a+1'})
+        self.assertEqual( res, '2' )
+
+    def test_evaluate_function_name_substring(self):
+        from arithmetic import evaluate
+        res = evaluate('f', variables={'af':'1'}, functions={'f': 'af'})
+        self.assertEqual( res, '1' )
+
+    def test_evaluate_function_recursive_no_initial_value(self):
+        from arithmetic import evaluate
+        res = evaluate('f', functions={'f': 'f+1'})
+        self.assertEqual( res, '0' )
+
 if __name__ == '__main__':
     unittest.main()
 
