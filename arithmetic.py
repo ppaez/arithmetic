@@ -129,6 +129,10 @@ class Lexer:
 from decimal import Decimal, getcontext
 getcontext().prec = 100
 
+def find(name, formula):
+    'Return True or False if name is used or not in formula'
+    return re.search( r'\b'+name+r'\b', formula)
+
 def evaluate( expression_text, UseDigitGrouping = True, variables = {}, functions = {} ):
     '''Parse expression, calculate and return its result.
 
@@ -171,7 +175,7 @@ def evaluate( expression_text, UseDigitGrouping = True, variables = {}, function
                 value = variables[ name ].replace( ',', '' )
                 expression.append( value )
             elif name in functions:
-                if name not in functions[ name ]:
+                if not find( name, functions[ name ]):
                     # standard formula
                     expression.append( str( evaluate( functions[ name ],
                                        UseDigitGrouping = False,
@@ -385,7 +389,7 @@ class Parser:
                                         self.writeResult( i, lines, mEqualSignAct.end(), RightActEnd, resultado )
 
                         else:                                  # function on the left: evaluate
-                            if valorLeft not in functions[ valorLeft ]:
+                            if not find(valorLeft, functions[ valorLeft ]):
                                 try:                # standard formula
                                     resultado = str( evaluate( valorLeft,
                                                 variables=variables, functions=functions ) )
