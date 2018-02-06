@@ -20,12 +20,13 @@ else
     exit 1
 fi
 
-echo Check the Python arithmetic module
+echo Check that the Python arithmetic module is installed
 pushd /tmp > /dev/null
 if python3 -u -c 'import arithmetic' > /dev/null 2>&1; then
     echo Ok
 else
     echo Missing. Run the command \"su -c 'python3 setup.py install'\" to install it
+    exit 2
 fi
 popd > /dev/null
 
