@@ -7,3 +7,8 @@ include pyroom-0.4.1-arithmetic.patch
 include calc.py
 include manual.rst
 include manual.html
+include vim-plugin/wrapper.py
+include vim-plugin/tutorial.txt
+include vim-plugin/arithmetic.vim
+include vim-plugin/arithmetic.txt
+include vim-plugin/install.sh
