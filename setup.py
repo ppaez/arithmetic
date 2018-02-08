@@ -7,7 +7,7 @@ except ImportError:
 
 import sys,os,string,time
 
-version = '0.5'
+version = '0.6'
 
 kwargs = dict()
 if has_setuptools:
@@ -37,11 +37,14 @@ setup(
 operations and text.  It resembles the calculator program bc.
 
 Tk, GTK and wxWidgets based sample editors that use the module
-are provided as a starting point.  A plugin for Zim and a patch for PyRoom
-editors.
+are provided as a starting point.  A plugin for Vim, a plugin ford Zim,
+and a patch for the PyRoom editors are included.
 
 Tutorial documents are included, they will quickly show
 all the features of arithmetic.''',
 	classifiers=[ "Development Status :: 3 - Alpha",
-		"Topic :: Text Processing" ],
+		      "Topic :: Text Processing",
+                      "Programming Language :: Python :: 2",
+                      "Programming Language :: Python :: 3"
+        ],
 )

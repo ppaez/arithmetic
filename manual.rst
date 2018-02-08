@@ -123,6 +123,11 @@ is not required)::
 
  # python setup.py install --home=~
 
+To install the Vim plugin::
+
+ # vim-plugin/install.sh
+
+
 Use in existing graphical applications
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

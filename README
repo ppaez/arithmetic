@@ -29,11 +29,14 @@ http://pp.com.mx/python/arithmetic
 Installing
 ----------
 
-To use the module or Libreta from any directory in your
+To use the module from any directory in your
 PC, cd to the source directory and type as root:
 
    python setup.py install
 
+To install the Vim plugin:
+
+   vim-plugin/install.sh
 
 Contributing
 ------------

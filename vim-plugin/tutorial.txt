@@ -1,0 +1,33 @@
+Assign values to variables:
+
+a = 12   b = 5
+
+Use the variables in expressions:
+
+a + b =        a x b =       a / b =      a - b =      a^b =   a**b =
+
+Define a formula:   area = height x width
+
+Assign values and request the result:
+
+     height = 200       width = 300
+
+     area = 
+
+Calculate the results for different points:
+
+width = 100   area = 
+width = 400   area = 
+width = 500   area = 
+
+Press <F5> now to obtain the results of all calculations
+in the document.
+
+You may change the key to '.' for example, with this
+command in Vim:
+
+:map . <Plug>ArithmeticCalculate
+
+Or add the line to your ~/.vimrc file:
+
+map . <Plug>ArithmeticCalculate
