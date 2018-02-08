@@ -1,0 +1,15 @@
+*arithmetic.txt*  Plugin for arithmetic
+
+arithmetic is a Python module that allows mixing arithmetic
+operations and text.
+                                                                      
+Mappings:                                                             
+<F5>   or   <Plug>ArithmeticCalculate
+        Calculate
+                                                                      
+Commands:                                                             
+:Calculate
+        Calculate
+                                                                      
+                                                *arithmetic-settings*   
+This plugin doesn't have any settings.                                

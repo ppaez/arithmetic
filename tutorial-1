@@ -24,5 +24,5 @@ Commands
 
 control-s saves the document.
 control-l reload the document, loosing changes.
-control-q ends Libreta.
+control-q ends the editor.
 <F5> recalculates.

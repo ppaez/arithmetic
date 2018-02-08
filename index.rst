@@ -4,12 +4,34 @@ arithmetic
 *arithmetic* is a Python module that allows mixing arithmetic
 operations and text.
 Tk, GTK and wxWidgets based sample editors that use the module
-are provided as a starting point.  A plugin for Zim and a patch for PyRoom
-editors.
+are provided as a starting point.  A plugin for Vim, a plugin for Zim
+and a patch for PyRoom editors.
 Tutorial documents are included, they will quickly show
 all the features of arithmetic.
 It is licensed under the Gnu GPL license version 2 or later.
 
+
+- Download
+
+You may install the current version using pip like this::
+
+  pip install arithmetic
+
+You can also get a tarball for manual installation from the `arithmetic
+page`__ in the Python Package Index.
+
+.. __: https://pypi.python.org/pypi/arithmetic
+
+You may install the development version by cloning the `arithmetic repository`__
+in GitHub with git like this::
+
+  git clone https://github.com/ppaez/arithmetic.git
+  cd arithmetic
+  python setup.py install
+
+.. __: https://github.com/ppaez/arithmetic
+
+Old versions are kept here just for reference:
 
 
 - Download
