@@ -45,7 +45,7 @@ This is a contributed plugin.  Download and install the arithmetic.py module fir
 
 	@classmethod
 	def check_dependencies(klass):
-                import subprocess
+		import subprocess
 		return [('arithmetic', 0 == subprocess.call( ['python', '-c', 'import arithmetic'] ) )]
 
 	def initialize_ui(self, ui):
