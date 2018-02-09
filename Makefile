@@ -2,7 +2,7 @@
 # Publish to web page src directory
 #
 
-VERSION = 0.6
+VERSION = 0.6.1
 PW_PATH=~/pw/src/python/arithmetic
 RST2HTML = rst2html
 
