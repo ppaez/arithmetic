@@ -1,5 +1,6 @@
+==========
 arithmetic
-================================================
+==========
 
 *arithmetic* is a Python module that allows mixing arithmetic
 operations and text.
@@ -11,30 +12,37 @@ all the features of arithmetic.
 It is licensed under the Gnu GPL license version 2 or later.
 
 
-- Download
+Install
+=======
 
-You may install the current version using pip like this::
+- Install the current version in the `Python Package Index`__::
 
-  pip install arithmetic
+    pip install arithmetic
 
-You can also get a tarball for manual installation from the `arithmetic
-page`__ in the Python Package Index.
+  to install the Vim plugin::
+
+    /usr/local/share/arithmetic-<version>/vim-plugin/install.sh
 
 .. __: https://pypi.python.org/pypi/arithmetic
 
-You may install the development version by cloning the `arithmetic repository`__
-in GitHub with git like this::
+- Install the development version from `GitHub`__::
 
-  git clone https://github.com/ppaez/arithmetic.git
-  cd arithmetic
-  python setup.py install
+    git clone https://github.com/ppaez/arithmetic.git
+    cd arithmetic
+    python setup.py install
 
-.. __: https://github.com/ppaez/arithmetic
+  to install the Vim plugin::
 
-Old versions are kept here just for reference:
+    vim-plugin/install.sh
+
+.. __: https://github.com/ppaez/arithmetic/tree/devel
 
 
-- Download
+`Documentation <manual.html>`_
+==============================
+
+Old versions
+============
 
 =================================   ===========
 Version                                 Date   
@@ -49,8 +57,6 @@ Version                                 Date
 ---------------------------------   -----------
 `0.1 <arithmetic-0.1.tar.gz>`_      13-Jul-2010
 =================================   ===========
-
-- `Documentation <manual.html>`_
 
 .. |date| date::
 .. |time| date:: %H:%M
