@@ -1,7 +1,7 @@
 #! /bin/bash
 
 SOURCE=$(dirname $0)
-DEST_PLUGIN=$HOME/.vim/plugin/arithmetic
+DEST_PLUGIN=$HOME/.vim/plugin
 DEST_DOC=$HOME/.vim/doc/arithmetic
 DEST_PYTHON3=$HOME/.vim/python3
 

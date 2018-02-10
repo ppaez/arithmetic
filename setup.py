@@ -7,7 +7,7 @@ except ImportError:
 
 import sys,os,string,time
 
-version = '0.6'
+version = '0.6.1'
 
 kwargs = dict()
 if has_setuptools:
@@ -26,10 +26,19 @@ setup(
 	url = 'http://pp.com.mx/python/arithmetic/',
 	license = 'GNU GPL v2 or later',
 	py_modules = [ 'arithmetic' ],
-	data_files = [ ( 'share/arithmetic-' + version, [ 'COPYING',
-		'CHANGELOG', 'README', 'tutorial-1', 'tutorial-2',
-                'pyroom-0.4.1-arithmetic.patch', 'calc.py',
-                'manual.rst', 'manual.html' ] ) ],
+	data_files = [('share/arithmetic-' + version,
+                       [ 'COPYING',
+		         'CHANGELOG', 'README',
+                         'tutorial-1', 'tutorial-2',
+                         'pyroom-0.4.1-arithmetic.patch', 'calc.py',
+                         'manual.rst', 'manual.html']),
+                       ('share/arithmetic-' + version + '/vim-plugin',
+                         ['vim-plugin/arithmetic.vim',
+                         'vim-plugin/wrapper.py',
+                         'vim-plugin/install.sh',
+                         'vim-plugin/tutorial.txt',
+                         'vim-plugin/arithmetic.txt']),
+        ],
 	scripts = [ 'editor-tk.py', 'arithmetic', 'editor-gtk.py',
                     'editor.ui', 'editor-wx.py' ],
 	platforms = ['any'],
