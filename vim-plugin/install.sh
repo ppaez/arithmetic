@@ -20,20 +20,11 @@ else
     exit 1
 fi
 
-echo Check that the Python arithmetic module is installed
-pushd /tmp > /dev/null
-if python3 -u -c 'import arithmetic' > /dev/null 2>&1; then
-    echo Ok
-else
-    echo Missing. Run the command \"su -c 'python3 setup.py install'\" to install it
-    exit 2
-fi
-popd > /dev/null
-
-echo Copy files
+echo Copy files under ~/.vim
 cp -avf $SOURCE/arithmetic.vim $DEST_PLUGIN
 cp -avf $SOURCE/arithmetic.txt $SOURCE/tutorial.txt $DEST_DOC
 cp -avf $SOURCE/wrapper.py $DEST_PYTHON3
+cp -avf $SOURCE/../arithmetic.py $DEST_PYTHON3
 echo Ok
 
 echo Prepare :help arithmetic

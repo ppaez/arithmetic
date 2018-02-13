@@ -18,9 +18,14 @@ endfunction
 " Map F5 by default
 if !hasmapto('<Plug>ArithmeticCalculate')
    map <unique> <F5> <Plug>ArithmeticCalculate
+   map! <unique> <F5> <Plug>ArithmeticCalculate
 endif
 noremap <unique> <script> <Plug>ArithmeticCalculate <SID>Calculate
 noremap <SID>Calculate :call <SID>Calculate()<CR>
+noremap! <unique> <script> <Plug>ArithmeticCalculate <SID>Calculate
+noremap! <SID>Calculate <ESC>:call <SID>Calculate()<CR>
+
+" Add Plugin -> Arithmetic menus
 noremenu <script> &Plugin.&Arithmetic.&Calculate<Tab>:Calculate <SID>Calculate
 noremenu <script> &Plugin.&Arithmetic.&Tutorial :edit $HOME/.vim/doc/arithmetic/tutorial.txt<CR>
 noremenu <script> &Plugin.&Arithmetic.&Help :help arithmetic<CR>

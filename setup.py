@@ -7,7 +7,7 @@ except ImportError:
 
 import sys,os,string,time
 
-version = '0.6.1'
+version = '0.6.2'
 
 kwargs = dict()
 if has_setuptools:

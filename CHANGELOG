@@ -1,3 +1,6 @@
+0.6.2 11 February 2018
+      Simplify installing the Vim plugin
+
 0.6.1 8 February 2018
       Fix setup.py to include vim-plugin
 
@@ -24,5 +27,5 @@
 0.2   1 August 2010
       Simplify and fix bugs
 
-0.1   13 July 2010 
+0.1   13 July 2010
       Initial release
