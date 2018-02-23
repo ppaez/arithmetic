@@ -39,9 +39,10 @@ Examples:
 
 Usage as module:
 
-     from arithmetic import feed
+     from arithmetic import Parser
      ...
-     resultText = feed( inputText )
+     parser = Parser()
+     resultText = parser.parse(inputText)
      ...
 '''
 
@@ -425,16 +426,6 @@ class Parser:
                     mEqualSignNext = reEqualSign.search( line, mEqualSignAct.end() )
                 mEqualSignPrev = mEqualSignAct
                 mEqualSignAct  = mEqualSignNext
-
-
-def feed( text ):
-    'Feed text to the parser.  It is processed line by line.'
-
-    # Create instance of parser
-    parser = Parser()
-
-    # Parse the text
-    return parser.parse( text )
 
 
 def AddCommas( s ):

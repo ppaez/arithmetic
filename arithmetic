@@ -1,7 +1,7 @@
 #! /usr/bin/python3
 
 import sys
-from arithmetic import feed
+from arithmetic import Parser
 from arithmetic import evaluate
 
 
@@ -11,17 +11,20 @@ if len( sys.argv ) >= 2:
     elif sys.argv[1] == '-f':
         filename = sys.argv[2]
         text = open( filename ).read()
-        print(feed( text ))
+        parser = Parser()
+        print(parser.parse(text))
     else:
         text =  ' '.join( sys.argv[ 1: ] )
         if '=' in text:
-            print(feed( text ))
+            parser = Parser()
+            print(parser.parse(text))
         else:
             print(evaluate( text ))
 else:
     text = sys.stdin.read()
     lines = text.splitlines()
     if '=' in text or len(lines) > 1:
-        print(feed( text ))
+        parser = Parser()
+        print(parser.parse(text))
     else:
         print(evaluate( lines[0] ))
