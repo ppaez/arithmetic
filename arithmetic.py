@@ -544,25 +544,3 @@ def AddCommas( s ):
     s = sign + s                    #restore sign
     return s
 
-if __name__ == '__main__':
-    import sys
-    if len( sys.argv ) >= 2:
-        if sys.argv[1] in [ '-h', '--help' ]:
-            print(__doc__)
-        elif sys.argv[1] == '-f':
-            filename = sys.argv[2]
-            text = open( filename ).read()
-            print(feed( text ))
-        else:
-            text =  ' '.join( sys.argv[ 1: ] )
-            if '=' in text:
-                print(feed( text ))
-            else:
-                print(evaluate( text ))
-    else:
-        text = sys.stdin.read()
-        lines = text.splitlines()
-        if '=' in text or len(lines) > 1:
-            print(feed( text ))
-        else:
-            print(evaluate( lines[0] ))
