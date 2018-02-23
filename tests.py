@@ -193,6 +193,112 @@ class Parser(unittest.TestCase):
         self.assertEqual( lines[0], 'a: 2+2 = 4  2x3=6' )
 
 
+class ParserParseLine(unittest.TestCase):
+
+
+    def setUp(self):
+        from unittest.mock import Mock
+        import arithmetic
+
+        arithmetic.print = Mock()
+
+    def tearDown(self):
+        import arithmetic
+
+        del arithmetic.print
+
+    def test_parseLine_evaluate_expression(self):
+        import arithmetic
+
+        parser = arithmetic.Parser()
+        lines = ['a + 1 =']
+        parser.parseLine(0, lines)
+        arithmetic.print.assert_called_with('eval error:', 'e' , 'a + 1', 'v', '')
+
+    def test_parseLine_assign_to_variable(self):
+        import arithmetic
+
+        parser = arithmetic.Parser()
+        lines = ['a=1']
+        variables = {}
+        parser.parseLine(0, lines, variables=variables)
+        self.assertEqual(variables, {'a': '1'})
+
+    def test_parseLine_assign_to_variable_exception(self):
+        import arithmetic
+        import decimal
+
+        parser = arithmetic.Parser()
+        lines = ['a=1/0']
+        self.assertRaises(decimal.DivisionByZero, parser.parseLine, 0, lines)
+
+    def test_parseLine_evaluate_variable(self):
+        import arithmetic
+
+        parser = arithmetic.Parser()
+        lines = ['a=']
+        variables = {'a': '1'}
+        parser.parseLine(0, lines, variables=variables)
+        self.assertEqual(lines, ['a=1'])
+
+    def test_parseLine_evaluate_function(self):
+        import arithmetic
+
+        parser = arithmetic.Parser()
+        lines = ['f=']
+        variables = {'a': '1'}
+        functions = {'f': 'a+1'}
+        parser.parseLine(0, lines, variables=variables, functions=functions)
+        self.assertEqual(lines, ['f=2'])
+
+    def test_parseLine_evaluate_function_exception(self):
+        import arithmetic
+
+        parser = arithmetic.Parser()
+        lines = ['f=']
+        functions = {'f': 'a+1'}
+        parser.parseLine(0, lines, functions=functions)
+        arithmetic.print.assert_called_with('eval error:', 'n', 'f', 'v', '')
+
+    def test_parseLine_function_recursive_initial_value(self):
+        import arithmetic
+
+        parser = arithmetic.Parser()
+        lines = ['f=1']
+        variables = {}
+        functions = {'f': 'f+3'}
+        parser.parseLine(0, lines, variables=variables, functions=functions)
+        self.assertEqual(variables, {'f': '1'})
+
+    def test_parseLine_function_recursive_iteration(self):
+        import arithmetic
+
+        parser = arithmetic.Parser()
+        lines = ['f=']
+        variables = {'f': '1'}
+        functions = {'f': 'f+3'}
+        parser.parseLine(0, lines, variables=variables, functions=functions)
+        self.assertEqual(variables, {'f': '4'})
+
+    def test_parseLine_define_function(self):
+        import arithmetic
+
+        parser = arithmetic.Parser()
+        lines = ['a=f+1']
+        functions = {}
+        parser.parseLine(0, lines, functions=functions)
+        self.assertEqual(functions, {'a': 'f+1'})
+
+    def test_parseLine_define_an_alias(self):
+        import arithmetic
+
+        parser = arithmetic.Parser()
+        lines = ['a=b']
+        functions = {}
+        parser.parseLine(0, lines, functions=functions)
+        self.assertEqual(functions, {'a': 'b'})
+
+
 class AddCommas(unittest.TestCase):
 
     def test_commas(self):
