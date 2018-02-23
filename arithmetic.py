@@ -354,9 +354,7 @@ class Parser:
                 RightEnds.append( mEndOfLine.start() )
                 RightActEnd = min( RightEnds )
 
-                rangolibre   = line[ RightPrevEnd          : LeftActStart ]
                 rangoLeft    = line[ LeftActStart          : mEqualSignAct.start() ]
-                rangocentro  = line[ mEqualSignAct.start() : mEqualSignAct.end() ]
                 rangoRight   = line[ mEqualSignAct.end()   : RightActEnd ]
 
                 tipoLeft, valorLeft = TypeAndValueOf( rangoLeft )
