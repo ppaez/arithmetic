@@ -207,7 +207,7 @@ class ParserParseLine(unittest.TestCase):
 
         del arithmetic.print
 
-    def test_parseLine_evaluate_expression(self):
+    def test_evaluate_expression(self):
         import arithmetic
 
         parser = arithmetic.Parser()
@@ -215,7 +215,7 @@ class ParserParseLine(unittest.TestCase):
         parser.parseLine(0, lines)
         arithmetic.print.assert_called_with('eval error:', 'e' , 'a + 1', 'v', '')
 
-    def test_parseLine_assign_to_variable(self):
+    def test_assign_to_variable(self):
         import arithmetic
 
         parser = arithmetic.Parser()
@@ -224,7 +224,7 @@ class ParserParseLine(unittest.TestCase):
         parser.parseLine(0, lines, variables=variables)
         self.assertEqual(variables, {'a': '1'})
 
-    def test_parseLine_assign_to_variable_exception(self):
+    def test_assign_to_variable_exception(self):
         import arithmetic
         import decimal
 
@@ -232,7 +232,7 @@ class ParserParseLine(unittest.TestCase):
         lines = ['a=1/0']
         self.assertRaises(decimal.DivisionByZero, parser.parseLine, 0, lines)
 
-    def test_parseLine_evaluate_variable(self):
+    def test_evaluate_variable(self):
         import arithmetic
 
         parser = arithmetic.Parser()
@@ -241,7 +241,7 @@ class ParserParseLine(unittest.TestCase):
         parser.parseLine(0, lines, variables=variables)
         self.assertEqual(lines, ['a=1'])
 
-    def test_parseLine_evaluate_function(self):
+    def test_evaluate_function(self):
         import arithmetic
 
         parser = arithmetic.Parser()
@@ -251,7 +251,7 @@ class ParserParseLine(unittest.TestCase):
         parser.parseLine(0, lines, variables=variables, functions=functions)
         self.assertEqual(lines, ['f=2'])
 
-    def test_parseLine_evaluate_function_exception(self):
+    def test_evaluate_function_exception(self):
         import arithmetic
 
         parser = arithmetic.Parser()
@@ -260,7 +260,7 @@ class ParserParseLine(unittest.TestCase):
         parser.parseLine(0, lines, functions=functions)
         arithmetic.print.assert_called_with('eval error:', 'n', 'f', 'v', '')
 
-    def test_parseLine_function_recursive_initial_value(self):
+    def test_function_recursive_initial_value(self):
         import arithmetic
 
         parser = arithmetic.Parser()
@@ -270,7 +270,7 @@ class ParserParseLine(unittest.TestCase):
         parser.parseLine(0, lines, variables=variables, functions=functions)
         self.assertEqual(variables, {'f': '1'})
 
-    def test_parseLine_function_recursive_iteration(self):
+    def test_function_recursive_iteration(self):
         import arithmetic
 
         parser = arithmetic.Parser()
@@ -280,7 +280,7 @@ class ParserParseLine(unittest.TestCase):
         parser.parseLine(0, lines, variables=variables, functions=functions)
         self.assertEqual(variables, {'f': '4'})
 
-    def test_parseLine_define_function(self):
+    def test_define_function(self):
         import arithmetic
 
         parser = arithmetic.Parser()
@@ -289,7 +289,7 @@ class ParserParseLine(unittest.TestCase):
         parser.parseLine(0, lines, functions=functions)
         self.assertEqual(functions, {'a': 'f+1'})
 
-    def test_parseLine_define_an_alias(self):
+    def test_define_an_alias(self):
         import arithmetic
 
         parser = arithmetic.Parser()
