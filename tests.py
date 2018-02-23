@@ -192,6 +192,15 @@ class Parser(unittest.TestCase):
         parser.parseLine(0, lines)
         self.assertEqual( lines[0], 'a: 2+2 = 4  2x3=6' )
 
+
+class AddCommas(unittest.TestCase):
+
+    def test_commas(self):
+        from arithmetic import AddCommas
+
+        self.assertEqual('1,000', AddCommas(1000))
+
+
 if __name__ == '__main__':
     unittest.main()
 
