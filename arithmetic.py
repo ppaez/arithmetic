@@ -316,12 +316,11 @@ class Parser:
 
             RightPrevStart = 0
             RightPrevEnd = 0
-            mEqualSignPrev = re.search( '^', line )
-            mEqualSignAct = reEqualSign.search( line, mEqualSignPrev.end() )
+            eqs_prev = 0
+            mEqualSignAct = reEqualSign.search(line, eqs_prev)
             while mEqualSignAct:
                 eqs_start = mEqualSignAct.start()
                 eqs_end = mEqualSignAct.end()
-                eqs_prev = mEqualSignPrev.end()
 
                 # Determine lhs_start,
                 # the larger of eqs_prev, mSeparLeft, mColonLeft, beginofline
@@ -425,7 +424,7 @@ class Parser:
 
                 if mEqualSignNext:
                     mEqualSignNext = reEqualSign.search( line, eqs_end)
-                mEqualSignPrev = mEqualSignAct
+                eqs_prev = eqs_end
                 mEqualSignAct  = mEqualSignNext
 
 
