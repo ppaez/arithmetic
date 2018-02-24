@@ -321,13 +321,14 @@ class Parser:
             while mEqualSignAct:
                 eqs_start = mEqualSignAct.start()
                 eqs_end = mEqualSignAct.end()
+                eqs_prev = mEqualSignPrev.end()
 
                 # Determine lhs_start,
-                # the larger of mEqualSignPrev, mSeparLeft, mColonLeft, beginofline
+                # the larger of eqs_prev, mSeparLeft, mColonLeft, beginofline
                 LeftStarts = []
-                LeftStarts.append( mEqualSignPrev.end() )
+                LeftStarts.append(eqs_prev)
 
-                mSeparLeft = reSepar.search( line, mEqualSignPrev.end(), eqs_start)
+                mSeparLeft = reSepar.search(line, eqs_prev, eqs_start)
                 if mSeparLeft:
                     SeparLeftEnd = mSeparLeft.end()
                     mSeparLeft = reSepar.search( line, mSeparLeft.end(), eqs_start)
@@ -336,7 +337,7 @@ class Parser:
                         mSeparLeft = reSepar.search( line, mSeparLeft.end(), eqs_start)
                     LeftStarts.append( SeparLeftEnd )
 
-                mColonLeft = reColonLeft.search( line, mEqualSignPrev.end(), eqs_start)
+                mColonLeft = reColonLeft.search(line, eqs_prev, eqs_start)
                 if mColonLeft:
                     LeftStarts.append( mColonLeft.end() )
                 mBeginOfLine = re.search( '^ *', line )
