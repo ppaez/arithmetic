@@ -354,11 +354,11 @@ class Parser:
                 RightEnds.append( mEndOfLine.start() )
                 RightActEnd = min( RightEnds )
 
-                rangoLeft    = line[ LeftActStart          : mEqualSignAct.start() ]
-                rangoRight   = line[ mEqualSignAct.end()   : RightActEnd ]
+                lhs = line[LeftActStart:mEqualSignAct.start()]
+                rhs = line[mEqualSignAct.end():RightActEnd]
 
-                tipoLeft, valorLeft = TypeAndValueOf( rangoLeft )
-                tipoRight, valorRight = TypeAndValueOf( rangoRight )
+                tipoLeft, valorLeft = TypeAndValueOf(lhs)
+                tipoRight, valorRight = TypeAndValueOf(rhs)
 
                 if tipoLeft != 'v': # there is something to the left
 
