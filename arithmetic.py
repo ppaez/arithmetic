@@ -319,22 +319,24 @@ class Parser:
             mEqualSignPrev = re.search( '^', line )
             mEqualSignAct = reEqualSign.search( line, mEqualSignPrev.end() )
             while mEqualSignAct:
+                eqs_start = mEqualSignAct.start()
+                eqs_end = mEqualSignAct.end()
 
                 # Determine lhs_start,
                 # the larger of mEqualSignPrev, mSeparLeft, mColonLeft, beginofline
                 LeftStarts = []
                 LeftStarts.append( mEqualSignPrev.end() )
 
-                mSeparLeft = reSepar.search( line, mEqualSignPrev.end(), mEqualSignAct.start() )
+                mSeparLeft = reSepar.search( line, mEqualSignPrev.end(), eqs_start)
                 if mSeparLeft:
                     SeparLeftEnd = mSeparLeft.end()
-                    mSeparLeft = reSepar.search( line, mSeparLeft.end(), mEqualSignAct.start() )
+                    mSeparLeft = reSepar.search( line, mSeparLeft.end(), eqs_start)
                     while mSeparLeft:     # search next
                         SeparLeftEnd = mSeparLeft.end()
-                        mSeparLeft = reSepar.search( line, mSeparLeft.end(), mEqualSignAct.start() )
+                        mSeparLeft = reSepar.search( line, mSeparLeft.end(), eqs_start)
                     LeftStarts.append( SeparLeftEnd )
 
-                mColonLeft = reColonLeft.search( line, mEqualSignPrev.end(), mEqualSignAct.start() )
+                mColonLeft = reColonLeft.search( line, mEqualSignPrev.end(), eqs_start)
                 if mColonLeft:
                     LeftStarts.append( mColonLeft.end() )
                 mBeginOfLine = re.search( '^ *', line )
@@ -344,18 +346,18 @@ class Parser:
                 # Determine rhs_end,
                 # the smaller of mEqualSignNext, mSeparRight, endofline
                 RightEnds = []
-                mEqualSignNext = reEqualSign.search( line, mEqualSignAct.end() )
+                mEqualSignNext = reEqualSign.search( line, eqs_end)
                 if mEqualSignNext:
                     RightEnds.append( mEqualSignNext.start() )
-                mSeparRight = reSepar.search( line, mEqualSignAct.end() )
+                mSeparRight = reSepar.search( line, eqs_end)
                 if mSeparRight:
                     RightEnds.append( mSeparRight.start() )
                 mEndOfLine = re.search( ' *$', line )
                 RightEnds.append( mEndOfLine.start() )
                 rhs_end = min(RightEnds)
 
-                lhs = line[lhs_start:mEqualSignAct.start()]
-                rhs = line[mEqualSignAct.end():rhs_end]
+                lhs = line[lhs_start:eqs_start]
+                rhs = line[eqs_end:rhs_end]
 
                 tipoLeft, valorLeft = TypeAndValueOf(lhs)
                 tipoRight, valorRight = TypeAndValueOf(rhs)
@@ -368,7 +370,7 @@ class Parser:
                         try:
                             resultado = str( evaluate( valorLeft,
                                         variables=variables, functions=functions ) )
-                            self.writeResult(i, lines, mEqualSignAct.end(), rhs_end, resultado)
+                            self.writeResult(i, lines, eqs_end, rhs_end, resultado)
                         except:
                             print('eval error:', tipoLeft, valorLeft, tipoRight, valorRight)
                     elif tipoLeft == 'n' and tipoRight in 'ifav':
@@ -385,14 +387,14 @@ class Parser:
                                 if valorLeft in variables:
                                         resultado = variables[ valorLeft ]
                                         resultado = AddCommas( resultado )
-                                        self.writeResult(i, lines, mEqualSignAct.end(), rhs_end, resultado)
+                                        self.writeResult(i, lines, eqs_end, rhs_end, resultado)
 
                         else:                                  # function on the left: evaluate
                             if not find(valorLeft, functions[ valorLeft ]):
                                 try:                # standard formula
                                     resultado = str( evaluate( valorLeft,
                                                 variables=variables, functions=functions ) )
-                                    self.writeResult(i, lines, mEqualSignAct.end(), rhs_end, resultado)
+                                    self.writeResult(i, lines, eqs_end, rhs_end, resultado)
                                 except:
                                     print('eval error:', tipoLeft, valorLeft, tipoRight, valorRight)
                             else:                   # recurrence relation
@@ -403,7 +405,7 @@ class Parser:
                                 else:                                         # iteration
                                     resultado = str( evaluate( functions[ valorLeft ],
                                                     variables=variables, functions=functions ) )
-                                    self.writeResult(i, lines, mEqualSignAct.end(), rhs_end, resultado)
+                                    self.writeResult(i, lines, eqs_end, rhs_end, resultado)
                                     variables[ valorLeft ] = resultado
 
                     elif tipoLeft == 'n' and tipoRight in 'e': # define a function
@@ -414,14 +416,14 @@ class Parser:
 
 
 
-                    RightPrevStart = mEqualSignAct.end()
+                    RightPrevStart = eqs_end
                     RightPrevEnd = rhs_end
 
                 # get line
                 line = self.readLine( i, lines )
 
                 if mEqualSignNext:
-                    mEqualSignNext = reEqualSign.search( line, mEqualSignAct.end() )
+                    mEqualSignNext = reEqualSign.search( line, eqs_end)
                 mEqualSignPrev = mEqualSignAct
                 mEqualSignAct  = mEqualSignNext
 
