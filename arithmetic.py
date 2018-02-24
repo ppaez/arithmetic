@@ -320,7 +320,7 @@ class Parser:
             mEqualSignAct = reEqualSign.search( line, mEqualSignPrev.end() )
             while mEqualSignAct:
 
-                # Determine LeftActStart,
+                # Determine lhs_start,
                 # the larger of mEqualSignPrev, mSeparLeft, mColonLeft, beginofline
                 LeftStarts = []
                 LeftStarts.append( mEqualSignPrev.end() )
@@ -339,9 +339,9 @@ class Parser:
                     LeftStarts.append( mColonLeft.end() )
                 mBeginOfLine = re.search( '^ *', line )
                 LeftStarts.append( mBeginOfLine.end() )
-                LeftActStart = max( LeftStarts )
+                lhs_start = max(LeftStarts)
 
-                # Determine RightActEnd,
+                # Determine rhs_end,
                 # the smaller of mEqualSignNext, mSeparRight, endofline
                 RightEnds = []
                 mEqualSignNext = reEqualSign.search( line, mEqualSignAct.end() )
@@ -352,10 +352,10 @@ class Parser:
                     RightEnds.append( mSeparRight.start() )
                 mEndOfLine = re.search( ' *$', line )
                 RightEnds.append( mEndOfLine.start() )
-                RightActEnd = min( RightEnds )
+                rhs_end = min(RightEnds)
 
-                lhs = line[LeftActStart:mEqualSignAct.start()]
-                rhs = line[mEqualSignAct.end():RightActEnd]
+                lhs = line[lhs_start:mEqualSignAct.start()]
+                rhs = line[mEqualSignAct.end():rhs_end]
 
                 tipoLeft, valorLeft = TypeAndValueOf(lhs)
                 tipoRight, valorRight = TypeAndValueOf(rhs)
@@ -368,7 +368,7 @@ class Parser:
                         try:
                             resultado = str( evaluate( valorLeft,
                                         variables=variables, functions=functions ) )
-                            self.writeResult( i, lines, mEqualSignAct.end(), RightActEnd, resultado )
+                            self.writeResult(i, lines, mEqualSignAct.end(), rhs_end, resultado)
                         except:
                             print('eval error:', tipoLeft, valorLeft, tipoRight, valorRight)
                     elif tipoLeft == 'n' and tipoRight in 'ifav':
@@ -385,14 +385,14 @@ class Parser:
                                 if valorLeft in variables:
                                         resultado = variables[ valorLeft ]
                                         resultado = AddCommas( resultado )
-                                        self.writeResult( i, lines, mEqualSignAct.end(), RightActEnd, resultado )
+                                        self.writeResult(i, lines, mEqualSignAct.end(), rhs_end, resultado)
 
                         else:                                  # function on the left: evaluate
                             if not find(valorLeft, functions[ valorLeft ]):
                                 try:                # standard formula
                                     resultado = str( evaluate( valorLeft,
                                                 variables=variables, functions=functions ) )
-                                    self.writeResult( i, lines, mEqualSignAct.end(), RightActEnd, resultado )
+                                    self.writeResult(i, lines, mEqualSignAct.end(), rhs_end, resultado)
                                 except:
                                     print('eval error:', tipoLeft, valorLeft, tipoRight, valorRight)
                             else:                   # recurrence relation
@@ -403,7 +403,7 @@ class Parser:
                                 else:                                         # iteration
                                     resultado = str( evaluate( functions[ valorLeft ],
                                                     variables=variables, functions=functions ) )
-                                    self.writeResult( i, lines, mEqualSignAct.end(), RightActEnd, resultado )
+                                    self.writeResult(i, lines, mEqualSignAct.end(), rhs_end, resultado)
                                     variables[ valorLeft ] = resultado
 
                     elif tipoLeft == 'n' and tipoRight in 'e': # define a function
@@ -415,7 +415,7 @@ class Parser:
 
 
                     RightPrevStart = mEqualSignAct.end()
-                    RightPrevEnd = RightActEnd
+                    RightPrevEnd = rhs_end
 
                 # get line
                 line = self.readLine( i, lines )
