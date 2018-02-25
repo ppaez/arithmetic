@@ -160,6 +160,38 @@ class TypeAndValueOf(unittest.TestCase):
         res = TypeAndValueOf('2 + 2')
         self.assertEqual( res, ('a', '2 + 2'))
 
+
+class FindLeftStarts(unittest.TestCase):
+
+    def test_begin_of_line(self):
+        from arithmetic import find_left_starts
+
+        expected = [0, 0]
+        result = find_left_starts('2+2 =', 0, 4, 5)
+        self.assertEqual(expected, result)
+
+    def test_spaces(self):
+        from arithmetic import find_left_starts
+
+        expected = [0, 5, 2]
+        result = find_left_starts('  a  2+2 =', 0, 9, 10)
+        self.assertEqual(expected, result)
+
+    def test_colon(self):
+        from arithmetic import find_left_starts
+
+        expected = [0, 3, 0]
+        result = find_left_starts('a: 2+2 =', 0, 7, 8)
+        self.assertEqual(expected, result)
+
+    def test_previous_equals_sign(self):
+        from arithmetic import find_left_starts
+
+        expected = [4, 0]
+        result = find_left_starts('a = 2+2 =', 4, 8, 9)
+        self.assertEqual(expected, result)
+
+
 class Parser(unittest.TestCase):
 
     def test_instance(self):

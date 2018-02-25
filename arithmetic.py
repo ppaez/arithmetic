@@ -277,6 +277,30 @@ def TypeAndValueOf( expression ):
     else:
         return 'a', expression
 
+
+def find_left_starts(line, eqs_prev, eqs_start, eqs_end):
+    'return the larger of eqs_prev, mSeparLeft, mColonLeft, beginofline'
+
+    LeftStarts = []
+    LeftStarts.append(eqs_prev)
+
+    mSeparLeft = reSepar.search(line, eqs_prev, eqs_start)
+    if mSeparLeft:
+        SeparLeftEnd = mSeparLeft.end()
+        mSeparLeft = reSepar.search( line, mSeparLeft.end(), eqs_start)
+        while mSeparLeft:     # search next
+            SeparLeftEnd = mSeparLeft.end()
+            mSeparLeft = reSepar.search( line, mSeparLeft.end(), eqs_start)
+        LeftStarts.append( SeparLeftEnd )
+
+    mColonLeft = reColonLeft.search(line, eqs_prev, eqs_start)
+    if mColonLeft:
+        LeftStarts.append( mColonLeft.end() )
+    mBeginOfLine = re.search( '^ *', line )
+    LeftStarts.append( mBeginOfLine.end() )
+    return LeftStarts
+
+
 class Parser:
     'Base class'
 
