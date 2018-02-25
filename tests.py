@@ -192,6 +192,35 @@ class FindLeftStarts(unittest.TestCase):
         self.assertEqual(expected, result)
 
 
+class FindRightEnds(unittest.TestCase):
+
+    def test_separator(self):
+        from arithmetic import find_right_ends
+
+        match_eqs_next = None
+        expected = [4, 4]
+        result = find_right_ends('2+1=    ', 4, match_eqs_next)
+        self.assertEqual(expected, result)
+
+    def test_equals_sign_next(self):
+        from unittest.mock import Mock
+        from arithmetic import find_right_ends
+
+        match_eqs_next = Mock()
+        match_eqs_next.start.return_value = 10
+        expected = [10, 4, 11]
+        result = find_right_ends('2+1=      =', 4, match_eqs_next)
+        self.assertEqual(expected, result)
+
+    def test_end_of_line(self):
+        from arithmetic import find_right_ends
+
+        match_eqs_next = None
+        expected = [4]
+        result = find_right_ends('2+1=', 4, match_eqs_next)
+        self.assertEqual(expected, result)
+
+
 class Parser(unittest.TestCase):
 
     def test_instance(self):

@@ -301,6 +301,20 @@ def find_left_starts(line, eqs_prev, eqs_start, eqs_end):
     return LeftStarts
 
 
+def find_right_ends(line, eqs_end, mEqualSignNext):
+    'return the smaller of mEqualSignNext, mSeparRight, endofline'
+
+    RightEnds = []
+    if mEqualSignNext:
+        RightEnds.append( mEqualSignNext.start() )
+    mSeparRight = reSepar.search( line, eqs_end)
+    if mSeparRight:
+        RightEnds.append( mSeparRight.start() )
+    mEndOfLine = re.search( ' *$', line )
+    RightEnds.append( mEndOfLine.start() )
+    return RightEnds
+
+
 class Parser:
     'Base class'
 
