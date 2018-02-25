@@ -317,14 +317,14 @@ def find_right_ends(line, eqs_end, mEqualSignNext):
 
 def perform_operations(lhs_type, lhs_value, rhs_type, rhs_value,
                        variables, functions,
-                       writeResult, eqs_end, rhs_end, lines, i):
+                       writeResult, rhs_start, rhs_end, lines, i):
     'perform operations, call writeResult as needed'
 
     if lhs_type in 'eaif' and rhs_type in 'vif':# evaluate expression
         try:
             resultado = str( evaluate(lhs_value,
                         variables=variables, functions=functions ) )
-            writeResult(i, lines, eqs_end, rhs_end, resultado)
+            writeResult(i, lines, rhs_start, rhs_end, resultado)
         except:
             print('eval error:', lhs_type, lhs_value, rhs_type, rhs_value)
     elif lhs_type == 'n' and rhs_type in 'ifav':
@@ -341,14 +341,14 @@ def perform_operations(lhs_type, lhs_value, rhs_type, rhs_value,
                 if lhs_value in variables:
                         resultado = variables[lhs_value]
                         resultado = AddCommas( resultado )
-                        writeResult(i, lines, eqs_end, rhs_end, resultado)
+                        writeResult(i, lines, rhs_start, rhs_end, resultado)
 
         else:                                  # function on the left: evaluate
             if not find(lhs_value, functions[lhs_value]):
                 try:                # standard formula
                     resultado = str(evaluate(lhs_value,
                                 variables=variables, functions=functions ) )
-                    writeResult(i, lines, eqs_end, rhs_end, resultado)
+                    writeResult(i, lines, rhs_start, rhs_end, resultado)
                 except:
                     print('eval error:', lhs_type, lhs_value, rhs_type, rhs_value)
             else:                   # recurrence relation
@@ -359,7 +359,7 @@ def perform_operations(lhs_type, lhs_value, rhs_type, rhs_value,
                 else:                                         # iteration
                     resultado = str( evaluate( functions[lhs_value],
                                     variables=variables, functions=functions ) )
-                    writeResult(i, lines, eqs_end, rhs_end, resultado)
+                    writeResult(i, lines, rhs_start, rhs_end, resultado)
                     variables[lhs_value] = resultado
 
     elif lhs_type == 'n' and rhs_type in 'e': # define a function
