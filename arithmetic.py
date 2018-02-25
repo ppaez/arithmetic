@@ -315,7 +315,9 @@ def find_right_ends(line, eqs_end, mEqualSignNext):
     return RightEnds
 
 
-def perform_operations(lhs_type, lhs_value, rhs_type, rhs_value, variables, functions, writeResult, eqs_end, rhs_end, lines, i):
+def perform_operations(lhs_type, lhs_value, rhs_type, rhs_value,
+                       variables, functions,
+                       writeResult, eqs_end, rhs_end, lines, i):
     'perform operations, call writeResult as needed'
 
     if lhs_type in 'eaif' and rhs_type in 'vif':# evaluate expression
