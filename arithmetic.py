@@ -364,16 +364,7 @@ class Parser:
                 LeftStarts = find_left_starts(line, eqs_prev, eqs_start, eqs_end)
                 lhs_start = max(LeftStarts)
 
-                # Determine rhs_end,
-                # the smaller of mEqualSignNext, mSeparRight, endofline
-                RightEnds = []
-                if mEqualSignNext:
-                    RightEnds.append( mEqualSignNext.start() )
-                mSeparRight = reSepar.search( line, eqs_end)
-                if mSeparRight:
-                    RightEnds.append( mSeparRight.start() )
-                mEndOfLine = re.search( ' *$', line )
-                RightEnds.append( mEndOfLine.start() )
+                RightEnds = find_right_ends(line, eqs_end, mEqualSignNext)
                 rhs_end = min(RightEnds)
 
                 lhs = line[lhs_start:eqs_start]
