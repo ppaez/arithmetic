@@ -315,56 +315,56 @@ def find_right_ends(line, eqs_end, mEqualSignNext):
     return RightEnds
 
 
-def perform_operations(tipoLeft, valorLeft, tipoRight, valorRight, variables, functions, writeResult, eqs_end, rhs_end, lines, i):
+def perform_operations(lhs_type, lhs_value, rhs_type, rhs_value, variables, functions, writeResult, eqs_end, rhs_end, lines, i):
     'perform operations, call writeResult as needed'
 
-    if tipoLeft in 'eaif' and tipoRight in 'vif':# evaluate expression
+    if lhs_type in 'eaif' and rhs_type in 'vif':# evaluate expression
         try:
-            resultado = str( evaluate( valorLeft,
+            resultado = str( evaluate(lhs_value,
                         variables=variables, functions=functions ) )
             writeResult(i, lines, eqs_end, rhs_end, resultado)
         except:
-            print('eval error:', tipoLeft, valorLeft, tipoRight, valorRight)
-    elif tipoLeft == 'n' and tipoRight in 'ifav':
-        if valorLeft not in functions:     # variable on the left
-            if tipoRight != 'v':    # assign to variable
+            print('eval error:', lhs_type, lhs_value, rhs_type, rhs_value)
+    elif lhs_type == 'n' and rhs_type in 'ifav':
+        if lhs_value not in functions:     # variable on the left
+            if rhs_type != 'v':    # assign to variable
                 try:
-                    variables[ valorLeft ] = str( evaluate( str( valorRight),
+                    variables[lhs_value] = str(evaluate(str(rhs_value),
                                             variables=variables, functions=functions ) )
 
                 except:
-                    print('exec error:', tipoLeft, valorLeft, tipoRight, valorRight)
+                    print('exec error:', lhs_type, lhs_value, rhs_type, rhs_value)
                     raise
             else:                   # evaluate a variable
-                if valorLeft in variables:
-                        resultado = variables[ valorLeft ]
+                if lhs_value in variables:
+                        resultado = variables[lhs_value]
                         resultado = AddCommas( resultado )
                         writeResult(i, lines, eqs_end, rhs_end, resultado)
 
         else:                                  # function on the left: evaluate
-            if not find(valorLeft, functions[ valorLeft ]):
+            if not find(lhs_value, functions[lhs_value]):
                 try:                # standard formula
-                    resultado = str( evaluate( valorLeft,
+                    resultado = str(evaluate(lhs_value,
                                 variables=variables, functions=functions ) )
                     writeResult(i, lines, eqs_end, rhs_end, resultado)
                 except:
-                    print('eval error:', tipoLeft, valorLeft, tipoRight, valorRight)
+                    print('eval error:', lhs_type, lhs_value, rhs_type, rhs_value)
             else:                   # recurrence relation
-                if valorLeft not in variables:            # initial value
-                  if valorRight != '':
-                    variables[ valorLeft ] = str( evaluate( str( valorRight ),
+                if lhs_value not in variables:            # initial value
+                  if rhs_value != '':
+                    variables[lhs_value] = str(evaluate(str(rhs_value),
                                             variables=variables, functions=functions ) )
                 else:                                         # iteration
-                    resultado = str( evaluate( functions[ valorLeft ],
+                    resultado = str( evaluate( functions[lhs_value],
                                     variables=variables, functions=functions ) )
                     writeResult(i, lines, eqs_end, rhs_end, resultado)
-                    variables[ valorLeft ] = resultado
+                    variables[lhs_value] = resultado
 
-    elif tipoLeft == 'n' and tipoRight in 'e': # define a function
-            functions[ valorLeft ] = str(valorRight)
+    elif lhs_type == 'n' and rhs_type in 'e': # define a function
+            functions[lhs_value] = str(rhs_value)
 
-    elif tipoLeft == 'n' and tipoRight in 'n': # define an alias
-            functions[ valorLeft ] = str(valorRight)
+    elif lhs_type == 'n' and rhs_type in 'n': # define an alias
+            functions[lhs_value] = str(rhs_value)
 
 
 class Parser:
@@ -422,11 +422,11 @@ class Parser:
                 lhs = line[lhs_start:eqs_start]
                 rhs = line[eqs_end:rhs_end]
 
-                tipoLeft, valorLeft = TypeAndValueOf(lhs)
-                tipoRight, valorRight = TypeAndValueOf(rhs)
+                lhs_type, lhs_value = TypeAndValueOf(lhs)
+                rhs_type, rhs_value = TypeAndValueOf(rhs)
 
-                if tipoLeft != 'v': # there is something to the left
-                    perform_operations(tipoLeft, valorLeft, tipoRight, valorRight,
+                if lhs_type != 'v': # there is something to the left
+                    perform_operations(lhs_type, lhs_value, rhs_type, rhs_value,
                                        variables, functions, self.writeResult,
                                        eqs_end, rhs_end, lines, i)
                     RightPrevStart = eqs_end
