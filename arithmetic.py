@@ -315,6 +315,58 @@ def find_right_ends(line, eqs_end, mEqualSignNext):
     return RightEnds
 
 
+def perform_operations(tipoLeft, valorLeft, tipoRight, valorRight, variables, functions, writeResult):
+    'perform operations, call writeResult as needed'
+
+    if tipoLeft in 'eaif' and tipoRight in 'vif':# evaluate expression
+        try:
+            resultado = str( evaluate( valorLeft,
+                        variables=variables, functions=functions ) )
+            self.writeResult(i, lines, eqs_end, rhs_end, resultado)
+        except:
+            print('eval error:', tipoLeft, valorLeft, tipoRight, valorRight)
+    elif tipoLeft == 'n' and tipoRight in 'ifav':
+        if valorLeft not in functions:     # variable on the left
+            if tipoRight != 'v':    # assign to variable
+                try:
+                    variables[ valorLeft ] = str( evaluate( str( valorRight),
+                                            variables=variables, functions=functions ) )
+
+                except:
+                    print('exec error:', tipoLeft, valorLeft, tipoRight, valorRight)
+                    raise
+            else:                   # evaluate a variable
+                if valorLeft in variables:
+                        resultado = variables[ valorLeft ]
+                        resultado = AddCommas( resultado )
+                        self.writeResult(i, lines, eqs_end, rhs_end, resultado)
+
+        else:                                  # function on the left: evaluate
+            if not find(valorLeft, functions[ valorLeft ]):
+                try:                # standard formula
+                    resultado = str( evaluate( valorLeft,
+                                variables=variables, functions=functions ) )
+                    self.writeResult(i, lines, eqs_end, rhs_end, resultado)
+                except:
+                    print('eval error:', tipoLeft, valorLeft, tipoRight, valorRight)
+            else:                   # recurrence relation
+                if valorLeft not in variables:            # initial value
+                  if valorRight != '':
+                    variables[ valorLeft ] = str( evaluate( str( valorRight ),
+                                            variables=variables, functions=functions ) )
+                else:                                         # iteration
+                    resultado = str( evaluate( functions[ valorLeft ],
+                                    variables=variables, functions=functions ) )
+                    self.writeResult(i, lines, eqs_end, rhs_end, resultado)
+                    variables[ valorLeft ] = resultado
+
+    elif tipoLeft == 'n' and tipoRight in 'e': # define a function
+            functions[ valorLeft ] = str(valorRight)
+
+    elif tipoLeft == 'n' and tipoRight in 'n': # define an alias
+            functions[ valorLeft ] = str(valorRight)
+
+
 class Parser:
     'Base class'
 
