@@ -315,14 +315,14 @@ def find_right_ends(line, eqs_end, mEqualSignNext):
     return RightEnds
 
 
-def perform_operations(tipoLeft, valorLeft, tipoRight, valorRight, variables, functions, writeResult):
+def perform_operations(tipoLeft, valorLeft, tipoRight, valorRight, variables, functions, writeResult, eqs_end, rhs_end, lines, i):
     'perform operations, call writeResult as needed'
 
     if tipoLeft in 'eaif' and tipoRight in 'vif':# evaluate expression
         try:
             resultado = str( evaluate( valorLeft,
                         variables=variables, functions=functions ) )
-            self.writeResult(i, lines, eqs_end, rhs_end, resultado)
+            writeResult(i, lines, eqs_end, rhs_end, resultado)
         except:
             print('eval error:', tipoLeft, valorLeft, tipoRight, valorRight)
     elif tipoLeft == 'n' and tipoRight in 'ifav':
@@ -339,14 +339,14 @@ def perform_operations(tipoLeft, valorLeft, tipoRight, valorRight, variables, fu
                 if valorLeft in variables:
                         resultado = variables[ valorLeft ]
                         resultado = AddCommas( resultado )
-                        self.writeResult(i, lines, eqs_end, rhs_end, resultado)
+                        writeResult(i, lines, eqs_end, rhs_end, resultado)
 
         else:                                  # function on the left: evaluate
             if not find(valorLeft, functions[ valorLeft ]):
                 try:                # standard formula
                     resultado = str( evaluate( valorLeft,
                                 variables=variables, functions=functions ) )
-                    self.writeResult(i, lines, eqs_end, rhs_end, resultado)
+                    writeResult(i, lines, eqs_end, rhs_end, resultado)
                 except:
                     print('eval error:', tipoLeft, valorLeft, tipoRight, valorRight)
             else:                   # recurrence relation
@@ -357,7 +357,7 @@ def perform_operations(tipoLeft, valorLeft, tipoRight, valorRight, variables, fu
                 else:                                         # iteration
                     resultado = str( evaluate( functions[ valorLeft ],
                                     variables=variables, functions=functions ) )
-                    self.writeResult(i, lines, eqs_end, rhs_end, resultado)
+                    writeResult(i, lines, eqs_end, rhs_end, resultado)
                     variables[ valorLeft ] = resultado
 
     elif tipoLeft == 'n' and tipoRight in 'e': # define a function
