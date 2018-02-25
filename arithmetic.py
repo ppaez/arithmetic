@@ -321,6 +321,7 @@ class Parser:
             while mEqualSignAct:
                 eqs_start = mEqualSignAct.start()
                 eqs_end = mEqualSignAct.end()
+                mEqualSignNext = reEqualSign.search( line, eqs_end)
 
                 # Determine lhs_start,
                 # the larger of eqs_prev, mSeparLeft, mColonLeft, beginofline
@@ -346,7 +347,6 @@ class Parser:
                 # Determine rhs_end,
                 # the smaller of mEqualSignNext, mSeparRight, endofline
                 RightEnds = []
-                mEqualSignNext = reEqualSign.search( line, eqs_end)
                 if mEqualSignNext:
                     RightEnds.append( mEqualSignNext.start() )
                 mSeparRight = reSepar.search( line, eqs_end)
