@@ -39,9 +39,10 @@ Examples:
 
 Usage as module:
 
-     from arithmetic import feed
+     from arithmetic import Parser
      ...
-     resultText = feed( inputText )
+     parser = Parser()
+     resultText = parser.parse(inputText)
      ...
 '''
 
@@ -276,6 +277,98 @@ def TypeAndValueOf( expression ):
     else:
         return 'a', expression
 
+
+def find_left_starts(line, eqs_prev, eqs_start, eqs_end):
+    'return the larger of eqs_prev, mSeparLeft, mColonLeft, beginofline'
+
+    LeftStarts = []
+    LeftStarts.append(eqs_prev)
+
+    mSeparLeft = reSepar.search(line, eqs_prev, eqs_start)
+    if mSeparLeft:
+        SeparLeftEnd = mSeparLeft.end()
+        mSeparLeft = reSepar.search( line, mSeparLeft.end(), eqs_start)
+        while mSeparLeft:     # search next
+            SeparLeftEnd = mSeparLeft.end()
+            mSeparLeft = reSepar.search( line, mSeparLeft.end(), eqs_start)
+        LeftStarts.append( SeparLeftEnd )
+
+    mColonLeft = reColonLeft.search(line, eqs_prev, eqs_start)
+    if mColonLeft:
+        LeftStarts.append( mColonLeft.end() )
+    mBeginOfLine = re.search( '^ *', line )
+    LeftStarts.append( mBeginOfLine.end() )
+    return LeftStarts
+
+
+def find_right_ends(line, eqs_end, mEqualSignNext):
+    'return the smaller of mEqualSignNext, mSeparRight, endofline'
+
+    RightEnds = []
+    if mEqualSignNext:
+        RightEnds.append( mEqualSignNext.start() )
+    mSeparRight = reSepar.search( line, eqs_end)
+    if mSeparRight:
+        RightEnds.append( mSeparRight.start() )
+    mEndOfLine = re.search( ' *$', line )
+    RightEnds.append( mEndOfLine.start() )
+    return RightEnds
+
+
+def perform_operations(lhs_type, lhs_value, rhs_type, rhs_value,
+                       variables, functions,
+                       writeResult, rhs_start, rhs_end, lines, i):
+    'perform operations, call writeResult as needed'
+
+    if lhs_type in 'eaif' and rhs_type in 'vif':# evaluate expression
+        try:
+            resultado = str( evaluate(lhs_value,
+                        variables=variables, functions=functions ) )
+            writeResult(i, lines, rhs_start, rhs_end, resultado)
+        except:
+            print('eval error:', lhs_type, lhs_value, rhs_type, rhs_value)
+    elif lhs_type == 'n' and rhs_type in 'ifav':
+        if lhs_value not in functions:     # variable on the left
+            if rhs_type != 'v':    # assign to variable
+                try:
+                    variables[lhs_value] = str(evaluate(str(rhs_value),
+                                            variables=variables, functions=functions ) )
+
+                except:
+                    print('exec error:', lhs_type, lhs_value, rhs_type, rhs_value)
+                    raise
+            else:                   # evaluate a variable
+                if lhs_value in variables:
+                        resultado = variables[lhs_value]
+                        resultado = AddCommas( resultado )
+                        writeResult(i, lines, rhs_start, rhs_end, resultado)
+
+        else:                                  # function on the left: evaluate
+            if not find(lhs_value, functions[lhs_value]):
+                try:                # standard formula
+                    resultado = str(evaluate(lhs_value,
+                                variables=variables, functions=functions ) )
+                    writeResult(i, lines, rhs_start, rhs_end, resultado)
+                except:
+                    print('eval error:', lhs_type, lhs_value, rhs_type, rhs_value)
+            else:                   # recurrence relation
+                if lhs_value not in variables:            # initial value
+                  if rhs_value != '':
+                    variables[lhs_value] = str(evaluate(str(rhs_value),
+                                            variables=variables, functions=functions ) )
+                else:                                         # iteration
+                    resultado = str( evaluate( functions[lhs_value],
+                                    variables=variables, functions=functions ) )
+                    writeResult(i, lines, rhs_start, rhs_end, resultado)
+                    variables[lhs_value] = resultado
+
+    elif lhs_type == 'n' and rhs_type in 'e': # define a function
+            functions[lhs_value] = str(rhs_value)
+
+    elif lhs_type == 'n' and rhs_type in 'n': # define an alias
+            functions[lhs_value] = str(rhs_value)
+
+
 class Parser:
     'Base class'
 
@@ -315,210 +408,39 @@ class Parser:
 
             RightPrevStart = 0
             RightPrevEnd = 0
-            mEqualSignPrev = re.search( '^', line )
-            mEqualSignAct = reEqualSign.search( line, mEqualSignPrev.end() )
+            eqs_prev = 0
+            mEqualSignAct = reEqualSign.search(line, eqs_prev)
             while mEqualSignAct:
+                eqs_start = mEqualSignAct.start()
+                eqs_end = mEqualSignAct.end()
+                mEqualSignNext = reEqualSign.search( line, eqs_end)
 
-                # Determine LeftActStart,
-                # the larger of mEqualSignPrev, mSeparLeft, mColonLeft, beginofline
-                LeftStarts = []
-                LeftStarts.append( mEqualSignPrev.end() )
+                LeftStarts = find_left_starts(line, eqs_prev, eqs_start, eqs_end)
+                lhs_start = max(LeftStarts)
 
-                mSeparLeft = reSepar.search( line, mEqualSignPrev.end(), mEqualSignAct.start() )
-                if mSeparLeft:
-                    SeparLeftEnd = mSeparLeft.end()
-                    mSeparLeft = reSepar.search( line, mSeparLeft.end(), mEqualSignAct.start() )
-                    while mSeparLeft:     # search next
-                        SeparLeftEnd = mSeparLeft.end()
-                        mSeparLeft = reSepar.search( line, mSeparLeft.end(), mEqualSignAct.start() )
-                    LeftStarts.append( SeparLeftEnd )
+                RightEnds = find_right_ends(line, eqs_end, mEqualSignNext)
+                rhs_end = min(RightEnds)
 
-                mColonLeft = reColonLeft.search( line, mEqualSignPrev.end(), mEqualSignAct.start() )
-                if mColonLeft:
-                    LeftStarts.append( mColonLeft.end() )
-                mBeginOfLine = re.search( '^ *', line )
-                LeftStarts.append( mBeginOfLine.end() )
-                LeftActStart = max( LeftStarts )
+                lhs = line[lhs_start:eqs_start]
+                rhs = line[eqs_end:rhs_end]
 
-                # Determine RightActEnd,
-                # the smaller of mEqualSignNext, mSeparRight, endofline
-                RightEnds = []
-                mEqualSignNext = reEqualSign.search( line, mEqualSignAct.end() )
-                if mEqualSignNext:
-                    RightEnds.append( mEqualSignNext.start() )
-                mSeparRight = reSepar.search( line, mEqualSignAct.end() )
-                if mSeparRight:
-                    RightEnds.append( mSeparRight.start() )
-                mEndOfLine = re.search( ' *$', line )
-                RightEnds.append( mEndOfLine.start() )
-                RightActEnd = min( RightEnds )
+                lhs_type, lhs_value = TypeAndValueOf(lhs)
+                rhs_type, rhs_value = TypeAndValueOf(rhs)
 
-                rangolibre   = line[ RightPrevEnd          : LeftActStart ]
-                rangoLeft    = line[ LeftActStart          : mEqualSignAct.start() ]
-                rangocentro  = line[ mEqualSignAct.start() : mEqualSignAct.end() ]
-                rangoRight   = line[ mEqualSignAct.end()   : RightActEnd ]
-
-                tipoLeft, valorLeft = TypeAndValueOf( rangoLeft )
-                tipoRight, valorRight = TypeAndValueOf( rangoRight )
-
-                if tipoLeft != 'v': # there is something to the left
-
-                    # perform operations
-
-                    if tipoLeft in 'eaif' and tipoRight in 'vif':# evaluate expression
-                        try:
-                            resultado = str( evaluate( valorLeft,
-                                        variables=variables, functions=functions ) )
-                            self.writeResult( i, lines, mEqualSignAct.end(), RightActEnd, resultado )
-                        except:
-                            print('eval error:', tipoLeft, valorLeft, tipoRight, valorRight)
-                    elif tipoLeft == 'n' and tipoRight in 'ifav':
-                        if valorLeft not in functions:     # variable on the left
-                            if tipoRight != 'v':    # assign to variable
-                                try:
-                                    variables[ valorLeft ] = str( evaluate( str( valorRight),
-                                                            variables=variables, functions=functions ) )
-
-                                except:
-                                    print('exec error:', tipoLeft, valorLeft, tipoRight, valorRight)
-                                    raise
-                            else:                   # evaluate a variable
-                                if valorLeft in variables:
-                                        resultado = variables[ valorLeft ]
-                                        resultado = AddCommas( resultado )
-                                        self.writeResult( i, lines, mEqualSignAct.end(), RightActEnd, resultado )
-
-                        else:                                  # function on the left: evaluate
-                            if not find(valorLeft, functions[ valorLeft ]):
-                                try:                # standard formula
-                                    resultado = str( evaluate( valorLeft,
-                                                variables=variables, functions=functions ) )
-                                    self.writeResult( i, lines, mEqualSignAct.end(), RightActEnd, resultado )
-                                except:
-                                    print('eval error:', tipoLeft, valorLeft, tipoRight, valorRight)
-                            else:                   # recurrence relation
-                                if valorLeft not in variables:            # initial value
-                                  if valorRight != '':
-                                    variables[ valorLeft ] = str( evaluate( str( valorRight ),
-                                                            variables=variables, functions=functions ) )
-                                else:                                         # iteration
-                                    resultado = str( evaluate( functions[ valorLeft ],
-                                                    variables=variables, functions=functions ) )
-                                    self.writeResult( i, lines, mEqualSignAct.end(), RightActEnd, resultado )
-                                    variables[ valorLeft ] = resultado
-
-                    elif tipoLeft == 'n' and tipoRight in 'e': # define a function
-                            functions[ valorLeft ] = str(valorRight)
-
-                    elif tipoLeft == 'n' and tipoRight in 'n': # define an alias
-                            functions[ valorLeft ] = str(valorRight)
-
-
-
-                    RightPrevStart = mEqualSignAct.end()
-                    RightPrevEnd = RightActEnd
+                if lhs_type != 'v': # there is something to the left
+                    perform_operations(lhs_type, lhs_value, rhs_type, rhs_value,
+                                       variables, functions, self.writeResult,
+                                       eqs_end, rhs_end, lines, i)
+                    RightPrevStart = eqs_end
+                    RightPrevEnd = rhs_end
 
                 # get line
                 line = self.readLine( i, lines )
 
                 if mEqualSignNext:
-                    mEqualSignNext = reEqualSign.search( line, mEqualSignAct.end() )
-                mEqualSignPrev = mEqualSignAct
+                    mEqualSignNext = reEqualSign.search( line, eqs_end)
+                eqs_prev = eqs_end
                 mEqualSignAct  = mEqualSignNext
-
-
-class ParserTk(Parser):
-    ''
-
-    def parse( self, textWidget ):
-        ''
-        for i in range( self.countLines( textWidget ) ):
-            self.parseLine( i, textWidget, variables=self.variables, functions=self.functions )
-
-    def countLines( self, textWidget ):
-        ''
-        return int(textWidget.index( 'end' ).split('.')[0])
-
-    def readLine( self, i, textWidget ):
-        ''
-        return textWidget.get( str(i) + '.0', str(i) + '.end'   )
-
-    def writeResult( self, i, textWidget, start, end, text ):
-        'Write text in line i of lines from start to end offset.'
-        textWidget.delete( str(i) + '.' + str(start), str(i) + '.' + str(end) )
-        textWidget.insert( str(i) + '.' + str(start), text )
-
-class ParserGTK(Parser):
-    ''
-
-    def parse( self, textBuffer ):
-        ''
-        for i in range( self.countLines( textBuffer ) ):
-            self.parseLine( i, textBuffer, variables=self.variables, functions=self.functions )
-
-    def countLines( self, textBuffer ):
-        ''
-        return textBuffer.get_line_count()
-
-    def readLine( self, i, textBuffer ):
-        ''
-        iter_start = textBuffer.get_iter_at_line( i )
-        if iter_start.ends_line():
-            return ''
-        else:
-            iter_end = textBuffer.get_iter_at_line( i )
-            iter_end.forward_to_line_end()
-            return textBuffer.get_text( iter_start, iter_end )
-
-    def writeResult( self, i, textBuffer, start, end, text ):
-        'Write text in line i of lines from start to end offset.'
-        # Delete
-        if end > start:
-            # handle start at end of line or beyond
-            iter_line = textBuffer.get_iter_at_line( i )
-            nchars = iter_line.get_chars_in_line()
-            if start > nchars-1:
-                start = nchars-1
-            iter_start = textBuffer.get_iter_at_line_offset( i, start )
-            iter_end = textBuffer.get_iter_at_line_offset( i, end )
-            textBuffer.delete( iter_start, iter_end )
-
-        # Insert
-        iter_start = textBuffer.get_iter_at_line_offset( i, start )
-        textBuffer.insert( iter_start, text )
-
-class ParserWx(Parser):
-    ''
-
-    def parse( self, TextControl ):
-        ''
-        for i in range( self.countLines( TextControl ) ):
-            self.parseLine( i, TextControl, variables=self.variables, functions=self.functions )
-
-    def countLines( self, TextControl ):
-        ''
-        return TextControl.GetNumberOfLines()
-
-    def readLine( self, i, TextControl ):
-        ''
-        return TextControl.GetLineText(i)
-
-    def writeResult( self, i, TextControl, start, end, text ):
-        'Write text in line i of lines from start to end offset.'
-
-        # Convert line, column to offset
-        startOffset = TextControl.XYToPosition( start, i)
-        endOffset = TextControl.XYToPosition( end, i)
-        TextControl.Replace( startOffset, endOffset, text )
-
-def feed( text ):
-    'Feed text to the parser.  It is processed line by line.'
-
-    # Create instance of parser
-    parser = Parser()
-
-    # Parse the text
-    return parser.parse( text )
 
 
 def AddCommas( s ):
@@ -544,25 +466,3 @@ def AddCommas( s ):
     s = sign + s                    #restore sign
     return s
 
-if __name__ == '__main__':
-    import sys
-    if len( sys.argv ) >= 2:
-        if sys.argv[1] in [ '-h', '--help' ]:
-            print(__doc__)
-        elif sys.argv[1] == '-f':
-            filename = sys.argv[2]
-            text = open( filename ).read()
-            print(feed( text ))
-        else:
-            text =  ' '.join( sys.argv[ 1: ] )
-            if '=' in text:
-                print(feed( text ))
-            else:
-                print(evaluate( text ))
-    else:
-        text = sys.stdin.read()
-        lines = text.splitlines()
-        if '=' in text or len(lines) > 1:
-            print(feed( text ))
-        else:
-            print(evaluate( lines[0] ))
