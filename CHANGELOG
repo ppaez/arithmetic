@@ -1,3 +1,8 @@
+0.7   6 March 2018
+      Add a script for Emacs
+      Move graphics routines to each editor example
+      Move the main block to the arithmetic script
+
 0.6.2 11 February 2018
       Simplify installing the Vim plugin
 

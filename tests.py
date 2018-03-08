@@ -160,6 +160,184 @@ class TypeAndValueOf(unittest.TestCase):
         res = TypeAndValueOf('2 + 2')
         self.assertEqual( res, ('a', '2 + 2'))
 
+
+class FindLeftStarts(unittest.TestCase):
+
+    def test_begin_of_line(self):
+        from arithmetic import find_left_starts
+
+        expected = [0, 0]
+        result = find_left_starts('2+2 =', 0, 4, 5)
+        self.assertEqual(expected, result)
+
+    def test_spaces(self):
+        from arithmetic import find_left_starts
+
+        expected = [0, 5, 2]
+        result = find_left_starts('  a  2+2 =', 0, 9, 10)
+        self.assertEqual(expected, result)
+
+    def test_colon(self):
+        from arithmetic import find_left_starts
+
+        expected = [0, 3, 0]
+        result = find_left_starts('a: 2+2 =', 0, 7, 8)
+        self.assertEqual(expected, result)
+
+    def test_previous_equals_sign(self):
+        from arithmetic import find_left_starts
+
+        expected = [4, 0]
+        result = find_left_starts('a = 2+2 =', 4, 8, 9)
+        self.assertEqual(expected, result)
+
+
+class FindRightEnds(unittest.TestCase):
+
+    def test_separator(self):
+        from arithmetic import find_right_ends
+
+        match_eqs_next = None
+        expected = [4, 4]
+        result = find_right_ends('2+1=    ', 4, match_eqs_next)
+        self.assertEqual(expected, result)
+
+    def test_equals_sign_next(self):
+        from unittest.mock import Mock
+        from arithmetic import find_right_ends
+
+        match_eqs_next = Mock()
+        match_eqs_next.start.return_value = 10
+        expected = [10, 4, 11]
+        result = find_right_ends('2+1=      =', 4, match_eqs_next)
+        self.assertEqual(expected, result)
+
+    def test_end_of_line(self):
+        from arithmetic import find_right_ends
+
+        match_eqs_next = None
+        expected = [4]
+        result = find_right_ends('2+1=', 4, match_eqs_next)
+        self.assertEqual(expected, result)
+
+
+class PerformOperations(unittest.TestCase):
+
+    def setUp(self):
+        from unittest.mock import Mock
+        import arithmetic
+
+        arithmetic.print = Mock()
+
+    def tearDown(self):
+        import arithmetic
+
+        del arithmetic.print
+
+    def test_evaluate_arithmetic_expression(self):
+        from unittest.mock import Mock
+        from arithmetic import perform_operations
+
+        write_result = Mock()
+        perform_operations('a', '2*3', 'v', '', {}, {},
+                           write_result, 10, 11, [], 0)
+        write_result.assert_called_with(0, [], 10, 11, '6')
+
+    def test_evaluate_expression_error(self):
+        from arithmetic import perform_operations
+        import arithmetic
+
+        perform_operations('a', 'a+3', 'v', '', {}, {},
+                           'write_result', 10, 11, [], 0)
+        arithmetic.print.assert_called_with('eval error:', 'a', 'a+3', 'v', '')
+
+    def test_assign_to_variable(self):
+        from arithmetic import perform_operations
+
+        variables = {}
+        perform_operations('n', 'a', 'i', '1', variables, {},
+                           'write_result', 10, 11, [], 0)
+        self.assertEqual(variables, {'a': '1'})
+
+    def test_assign_to_variable_error(self):
+        import decimal
+        from arithmetic import perform_operations
+        import arithmetic
+
+        self.assertRaises(decimal.DivisionByZero, perform_operations,
+                          'n', 'a', 'a', '1/0', {}, {},
+                          'write_result', 10, 11, [], 0)
+        arithmetic.print.assert_called_with('exec error:', 'n', 'a', 'a', '1/0')
+
+    def test_evaluate_variable(self):
+        from unittest.mock import Mock
+        from arithmetic import perform_operations
+
+        write_result = Mock()
+        variables = {'a': '5'}
+        perform_operations('n', 'a', 'v', '', variables, {},
+                           write_result, 10, 11, [], 0)
+        write_result.assert_called_with(0, [], 10, 11, '5')
+
+    def test_evaluate_function(self):
+        from unittest.mock import Mock
+        from arithmetic import perform_operations
+
+        write_result = Mock()
+        variables = {'a': '1'}
+        functions = {'f': 'a+1'}
+        perform_operations('n', 'f', 'v', '', variables, functions,
+                           write_result, 10, 11, [], 0)
+        write_result.assert_called_with(0, [], 10, 11, '2')
+
+    def test_evaluate_function_error(self):
+        from arithmetic import perform_operations
+        import arithmetic
+
+        functions = {'f': 'a+1'}
+        perform_operations('n', 'f', 'v', '', {}, functions,
+                           'write_result', 10, 11, [], 0)
+        arithmetic.print.assert_called_with('eval error:', 'n', 'f', 'v', '')
+
+    def test_recursive_function_initial_value(self):
+        from arithmetic import perform_operations
+
+        variables = {}
+        functions = {'f': 'f+3'}
+        perform_operations('n', 'f', 'i', '1', variables, functions,
+                           'write_result', 10, 11, [], 0)
+        self.assertEqual(variables, {'f': '1'})
+
+    def test_recursive_function_iteration(self):
+        from unittest.mock import Mock
+        from arithmetic import perform_operations
+
+        write_result = Mock()
+        variables = {'f': '1'}
+        functions = {'f': 'f+3'}
+        perform_operations('n', 'f', 'v', '', variables, functions,
+                           write_result, 10, 11, [], 0)
+        self.assertEqual(variables, {'f': '4'})
+
+    def test_define_function(self):
+        from arithmetic import perform_operations
+
+        variables = {}
+        functions = {}
+        perform_operations('n', 'a', 'e', 'f+1', variables, functions,
+                           'write_result', 10, 11, [], 0)
+        self.assertEqual(functions, {'a': 'f+1'})
+
+    def test_define_alias(self):
+        from arithmetic import perform_operations
+
+        variables = {}
+        functions = {}
+        perform_operations('n', 'a', 'n', 'b', variables, functions,
+                           'write_result', 10, 11, [], 0)
+        self.assertEqual(functions, {'a': 'b'})
+
+
 class Parser(unittest.TestCase):
 
     def test_instance(self):
@@ -191,6 +369,121 @@ class Parser(unittest.TestCase):
         lines = ['a: 2+2 =   2x3=']
         parser.parseLine(0, lines)
         self.assertEqual( lines[0], 'a: 2+2 = 4  2x3=6' )
+
+
+class ParserParseLine(unittest.TestCase):
+
+
+    def setUp(self):
+        from unittest.mock import Mock
+        import arithmetic
+
+        arithmetic.print = Mock()
+
+    def tearDown(self):
+        import arithmetic
+
+        del arithmetic.print
+
+    def test_evaluate_expression(self):
+        import arithmetic
+
+        parser = arithmetic.Parser()
+        lines = ['a + 1 =']
+        parser.parseLine(0, lines)
+        arithmetic.print.assert_called_with('eval error:', 'e' , 'a + 1', 'v', '')
+
+    def test_assign_to_variable(self):
+        import arithmetic
+
+        parser = arithmetic.Parser()
+        lines = ['a=1']
+        variables = {}
+        parser.parseLine(0, lines, variables=variables)
+        self.assertEqual(variables, {'a': '1'})
+
+    def test_assign_to_variable_exception(self):
+        import arithmetic
+        import decimal
+
+        parser = arithmetic.Parser()
+        lines = ['a=1/0']
+        self.assertRaises(decimal.DivisionByZero, parser.parseLine, 0, lines)
+
+    def test_evaluate_variable(self):
+        import arithmetic
+
+        parser = arithmetic.Parser()
+        lines = ['a=']
+        variables = {'a': '1'}
+        parser.parseLine(0, lines, variables=variables)
+        self.assertEqual(lines, ['a=1'])
+
+    def test_evaluate_function(self):
+        import arithmetic
+
+        parser = arithmetic.Parser()
+        lines = ['f=']
+        variables = {'a': '1'}
+        functions = {'f': 'a+1'}
+        parser.parseLine(0, lines, variables=variables, functions=functions)
+        self.assertEqual(lines, ['f=2'])
+
+    def test_evaluate_function_exception(self):
+        import arithmetic
+
+        parser = arithmetic.Parser()
+        lines = ['f=']
+        functions = {'f': 'a+1'}
+        parser.parseLine(0, lines, functions=functions)
+        arithmetic.print.assert_called_with('eval error:', 'n', 'f', 'v', '')
+
+    def test_function_recursive_initial_value(self):
+        import arithmetic
+
+        parser = arithmetic.Parser()
+        lines = ['f=1']
+        variables = {}
+        functions = {'f': 'f+3'}
+        parser.parseLine(0, lines, variables=variables, functions=functions)
+        self.assertEqual(variables, {'f': '1'})
+
+    def test_function_recursive_iteration(self):
+        import arithmetic
+
+        parser = arithmetic.Parser()
+        lines = ['f=']
+        variables = {'f': '1'}
+        functions = {'f': 'f+3'}
+        parser.parseLine(0, lines, variables=variables, functions=functions)
+        self.assertEqual(variables, {'f': '4'})
+
+    def test_define_function(self):
+        import arithmetic
+
+        parser = arithmetic.Parser()
+        lines = ['a=f+1']
+        functions = {}
+        parser.parseLine(0, lines, functions=functions)
+        self.assertEqual(functions, {'a': 'f+1'})
+
+    def test_define_an_alias(self):
+        import arithmetic
+
+        parser = arithmetic.Parser()
+        lines = ['a=b']
+        functions = {}
+        parser.parseLine(0, lines, functions=functions)
+        self.assertEqual(functions, {'a': 'b'})
+
+
+class AddCommas(unittest.TestCase):
+
+    def test_commas(self):
+        from arithmetic import AddCommas
+
+        self.assertEqual('1,000', AddCommas(1000))
+
 
 if __name__ == '__main__':
     unittest.main()
